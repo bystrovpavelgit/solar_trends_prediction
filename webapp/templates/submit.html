@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+			<p>{{ main_text }}</p>
+			<br>
+            <div class="col-2">
+            </div>
+            <div class="col-8">
+				<p>Выберите изображение</p>
+				<br>
+                <form action='' method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <p><input type='file' name='file'>
+                        </p>
+                    </div>
+                    <input type='submit' value={{ main_text }} class="btn btn-primary">
+                </form>
+            </div>
+            <div class="col-2">
+            </div>
+        </div>
+    </div>
+{% endblock %}
