@@ -1,5 +1,6 @@
 *.pyc
 settings.py
+webapp.db
 *.log
 .vscode/
 .idea/
