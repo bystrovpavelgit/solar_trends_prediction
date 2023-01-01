@@ -4,10 +4,16 @@
 """
 from flask import Flask, render_template
 from flask_login import LoginManager
-from flask_migrate import Migrate
 from webapp.db import DB
 from webapp.user.models import User
 from webapp.user.views import blueprint as user_blueprint
+import pandas as pd
+
+
+def create_line_plot():
+    """ create line plot """
+    df = pd.read_csv("data/solarn_month.csv", delimiter=";")
+    return df['year_float'].values, df['sunspots'].values
 
 
 def create_app():
@@ -20,8 +26,6 @@ def create_app():
     DB.init_app(app)
     app.register_blueprint(user_blueprint)
 
-    migrate = Migrate(app, DB)
-
     @login_mgr.user_loader
     def load_user(user_id):
         user = User.query.get(user_id)
@@ -30,5 +34,12 @@ def create_app():
     @app.route("/")
     def index():
         return render_template("index.html")
+
+    @app.route("/chart")
+    def draw():
+        dat1, dat2 = create_line_plot()
+        lst1 = list(dat1)
+        lst2 = list(dat2)
+        return render_template("chart.html", x=lst1, y=lst2)
 
     return app
