@@ -1,7 +1,8 @@
 """ unit test """
+import pandas as pd
 import unittest
 from webapp import create_app
-from webapp.business_logic import get_user_by_name
+from webapp.business_logic import get_user_by_name, create_line_plot
 
 
 class TestUser(unittest.TestCase):
@@ -13,11 +14,11 @@ class TestUser(unittest.TestCase):
 
     def test_sum(self):
         """ summation юнит-тест """
-        print("юнит-тест sum")
+        print("юнит-тест sum\n")
         self.assertEqual(sum([3, 2]), 5, "равен 5")
 
-    def test_logout(self):
-        """ test logout """
+    def test_get_user_by_name(self):
+        """ test get_user_by_name """
         app = create_app()
         with app.app_context():
             user = get_user_by_name("gav")
@@ -25,3 +26,16 @@ class TestUser(unittest.TestCase):
         self.assertIsNotNone(user, "user not None")
         self.assertEqual(user.username, "gav", "user.username == gav")
         self.assertTrue(user.id > 0, "user.id > 0")
+
+    def test_create_line_plot(self):
+        """ test create_line_plot """
+        data = pd.read_csv("data/solarn_month.csv", delimiter=";")
+        year = data['year_float'].values.tolist()
+        spots = data['sunspots'].values.tolist()
+
+        dat1, dat2 = create_line_plot()
+
+        self.assertIsNotNone(dat1, "year not None")
+        self.assertIsNotNone(dat2, "sunspots not None")
+        self.assertEqual(dat1, year, "user.username == gav")
+        self.assertEqual(dat2, spots, "user.username == gav")
