@@ -2,7 +2,8 @@
 import pandas as pd
 import unittest
 from webapp import create_app
-from webapp.business_logic import get_user_by_name, create_line_plot
+from webapp.business_logic import get_user_by_name
+from webapp.dl_logic import create_line_plot
 
 
 class TestUser(unittest.TestCase):
@@ -34,6 +35,7 @@ class TestUser(unittest.TestCase):
         spots = data['sunspots'].values.tolist()
 
         dat1, dat2 = create_line_plot()
+        dat1, dat2 = list(dat1), list(dat2)
 
         self.assertIsNotNone(dat1, "year not None")
         self.assertIsNotNone(dat2, "sunspots not None")
