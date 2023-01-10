@@ -14,14 +14,13 @@ def min_index(series, start, interval):
     return index
 
 
-def find_minimums(series, length, times):
+def find_minimums(series, length):
     """ find all minimums in series"""
     k = len(series) // length
     if len(series) > k * length:
         k += 1
     result = [min_index(series, i * length, length) for i in range(k)]
-    res = {j: times[j] for j in result}
-    return result, res
+    return result
 
 
 def moving_average(series, n):
@@ -167,25 +166,20 @@ class HoltWinters:
                 self.Smooth.append(smooth)
                 self.Trend.append(trend)
                 self.Season.append(seasonals[i % self.slen])
-
                 self.PredictedDeviation.append(0)
-
                 self.UpperBond.append(
                     self.result[0] + self.scaling_factor * self.PredictedDeviation[0]
                 )
-
                 self.LowerBond.append(
                     self.result[0] - self.scaling_factor * self.PredictedDeviation[0]
                 )
                 continue
 
-            if i >= len(self.series):  # predicting
+            if i >= len(self.series):
                 m = i - len(self.series) + 1
                 self.result.append((smooth + m * trend) + seasonals[i % self.slen])
-
                 # when predicting we increase uncertainty on each step
                 self.PredictedDeviation.append(self.PredictedDeviation[-1] * 1.01)
-
             else:
                 val = self.series[i]
                 last_smooth, smooth = (
@@ -199,7 +193,6 @@ class HoltWinters:
                         + (1 - self.gamma) * seasonals[i % self.slen]
                 )
                 self.result.append(smooth + trend + seasonals[i % self.slen])
-
                 # Deviation is calculated according to Brutlag algorithm.
                 self.PredictedDeviation.append(
                     self.gamma * np.abs(self.series[i] - self.result[i])
@@ -209,11 +202,9 @@ class HoltWinters:
             self.UpperBond.append(
                 self.result[-1] + self.scaling_factor * self.PredictedDeviation[-1]
             )
-
             self.LowerBond.append(
                 self.result[-1] - self.scaling_factor * self.PredictedDeviation[-1]
             )
-
             self.Smooth.append(smooth)
             self.Trend.append(trend)
             self.Season.append(seasonals[i % self.slen])

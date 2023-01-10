@@ -8,6 +8,7 @@ from webapp.db import DB
 from webapp.user.models import User
 from webapp.user.views import blueprint as user_blueprint
 from webapp.chart.views import blueprint as chart_blueprint
+from webapp.stat.views import blueprint as stat_blueprint
 
 
 def create_app():
@@ -20,6 +21,7 @@ def create_app():
     DB.init_app(app)
     app.register_blueprint(user_blueprint)
     app.register_blueprint(chart_blueprint)
+    app.register_blueprint(stat_blueprint)
 
     @login_mgr.user_loader
     def load_user(user_id):

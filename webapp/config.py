@@ -11,6 +11,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir,
                                                       "..",
                                                       "webapp.db")
-SECRET_KEY = "QWEWQYUhj342678gvmjhxckbdvkjbs321"
+SECRET_KEY = "ASDWQYUhj342678gvmjhxckbdvkjbscde"
 REMEMBER_COOKIE_DURATION = timedelta(days=7)
 SQLALCHEMY_TRACK_MODIFICATIONS = True
