@@ -1,6 +1,17 @@
 import pandas as pd
 import numpy as np
+from matplotlib import pyplot as plt
 from numpy import hstack
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression, RidgeClassifier, RidgeCV
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, \
+    AdaBoostRegressor, ExtraTreesClassifier, RandomForestRegressor, \
+    GradientBoostingRegressor, ExtraTreesRegressor, BaggingClassifier, \
+    BaggingRegressor, RandomForestClassifier
+from sklearn.metrics import mean_squared_error, r2_score
 from webapp.utils.trends_util import rolling_mean, find_minimums
 
 
@@ -45,4 +56,108 @@ def get_enriched_dataframe(csf_file="data/solarn_month.csv"):
     df["sn_mean"] = pd.Series(avg.tolist())
     df["sn_max"] = pd.Series(max_.tolist())
     df["sn_min"] = pd.Series(min_.tolist())
+
+    y_max = hstack([np.zeros([indices[17]]),
+                    np.ones((indices[20] - indices[17])),
+                    np.zeros([indices[-1] - indices[20]])])
+    y_min = hstack([np.zeros([indices[5]]),
+                    np.ones((indices[8] - indices[5])),
+                    np.zeros([indices[-1] - indices[8]])])
+    df["y_min"] = pd.Series(y_min.tolist())
+    df["y_max"] = pd.Series(y_max.tolist())
     return df
+
+
+def predict_cv_and_plot_results(clf, params, data, df):
+    """ predict_cv_and_plot_results """
+    y_max = df["y_max"].values
+    y_min = df["y_min"].values
+    # Initialize a stratified split of our dataset for the validation process
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=22)
+    gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data, y_max)
+    pred_max = gcv.predict(data) * 60
+    gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data, y_min)
+    pred_min = gcv.predict(data) * 100
+    class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
+    plt.figure(figsize=(16, 5))
+    plt.title(f"{class_name} prediction")
+    plt.plot(df['year_float'].values, df["sn_max"].values)
+    plt.plot(df['year_float'].values, df["mean_1y"].values)
+    plt.plot(df['year_float'].values, df["mean_12y"].values)
+    plt.plot(df['year_float'].values, pred_max)
+    plt.plot(df['year_float'].values, pred_min)
+    plt.show()
+
+
+def regression_with_cv_and_plot_results(clf, data, df, cols):
+    """ regression_with_cv_and_plot_results """
+    # ridge.fit(train_data_scaled, y_max)
+    # pred_rid = ridge.predict(train_data_scaled) * 50
+    # Initialize a stratified split of our dataset for the validation process
+    clf.fit(df[cols].values, data)
+    predict = clf.predict(df[cols].values)
+    class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
+    plt.figure(figsize=(16, 5))
+    plt.title(f"{class_name} prediction")
+    plt.plot(df['year_float'].values, df["sn_max"].values)
+    plt.plot(df['year_float'].values, df["mean_1y"].values)
+    plt.plot(df['year_float'].values, df["mean_12y"].values)
+    plt.plot(df['year_float'].values, predict)
+    plt.show()
+    print(mean_squared_error(data, predict), r2_score(data, predict))
+
+
+def find_best_classifier():
+    """ find_best_classifier """
+    df = get_enriched_dataframe()
+    cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y", "sn_mean", "sn_max", "sn_min"]
+
+    data_scaled = StandardScaler().fit_transform(df[cols].values)
+    params_lr = {'C': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
+    params_rid = {'alpha': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
+    params = {"n_estimators": [3, 4, 5, 7], "max_depth": [3, 4, 5, 6, 9]}
+    estimators = {"n_estimators": [4, 5, 7, 10, 12]}
+    params_dt = {"max_depth": [3, 4, 5, 6, 9]}
+    params_knn = {"n_neighbors": [4, 5, 7, 8, 10, 12]}
+    params_ada = {"n_estimators": [3, 4, 5, 7], "learning_rate": [0.2, 1., 9.9]}
+    classifiers = [
+        (LogisticRegression(), params_lr),
+        (RidgeClassifier(), params_rid),
+        (GradientBoostingClassifier(), params),
+        (BaggingClassifier(DecisionTreeClassifier()), estimators),
+        (DecisionTreeClassifier(), params_dt),
+        (RandomForestClassifier(), params),
+        (KNeighborsClassifier(), params_knn),
+        (AdaBoostClassifier(), params_ada),
+        (ExtraTreesClassifier(), params),
+    ]
+    for clf, parameters in classifiers:
+        predict_cv_and_plot_results(clf, parameters, data_scaled, df)
+
+
+def find_best_regressor():
+    """ find_best_regressor """
+    df = get_enriched_dataframe()
+    cols = ["observations", "mean_1y", "mean_3y", "mean_12y", "sn_mean", "sn_max", "sn_min"]
+    spots_data = df['sunspots'].values
+
+    reg = RandomForestRegressor()
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+
+    reg = GradientBoostingRegressor()
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+
+    reg = BaggingRegressor(DecisionTreeRegressor())
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+
+    reg = ExtraTreesRegressor()
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+
+    reg = AdaBoostRegressor()
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+
+    reg = RidgeCV(alphas=np.linspace(5, 200, 20) / 10)
+    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
+    print(reg.coef_)
