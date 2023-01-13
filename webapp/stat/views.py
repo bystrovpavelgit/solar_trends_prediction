@@ -21,12 +21,10 @@ def rolling_mean():
 @blueprint.route("/best")
 def best_model():
     time, pmax, pmin, max_, sunspots = get_results_for_best_classifier()
+    timeseries = time[:128].tolist()
     return render_template("stat/best.html",
-                           x=time[:128],
-                           y=pmax[:128],
-                           x2=time[:128],
-                           y2=pmin[:128],
-                           x3=time[:128],
-                           y3=max_[:128],
-                           x4=time[:128],
-                           y4=sunspots[:128])
+                           time=timeseries,
+                           y=pmax[:128].tolist(),
+                           y2=pmin[:128].tolist(),
+                           y3=max_[:128].tolist(),
+                           y4=sunspots[:128].tolist())
