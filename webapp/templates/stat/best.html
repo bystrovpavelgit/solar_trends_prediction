@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<body>
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+
+// Generate values
+var x1Val = {{ x }}
+var y1Val = {{ y }}
+var x2Val = {{ x2 }}
+var y2Val = {{ y2 }}
+var x3Val = {{ x3 }}
+var y3Val = {{ y3 }}
+var x4Val = {{ x4 }}
+var y4Val = {{ y4 }}
+
+// Define Data
+var data = [
+  {x: x1Val, y: y1Val, mode:"lines"},
+  {x: x2Val, y: y2Val, mode:"lines"},
+  {x: x3Val, y: y3Val, mode:"lines"},
+  {x: x4Val, y: y4Val, mode:"lines"},
+];
+
+//Define Layout
+var layout = {title: "[Sunspot Number]"};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+
+</body>
+</html>

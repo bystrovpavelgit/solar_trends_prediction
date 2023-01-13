@@ -1,14 +1,16 @@
 import pandas as pd
 import numpy as np
+from copy import deepcopy
 from matplotlib import pyplot as plt
 from numpy import hstack
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression, RidgeClassifier
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, \
     ExtraTreesClassifier, BaggingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
 from webapp.utils.trends_util import rolling_mean, find_minimums
 
 
@@ -66,18 +68,25 @@ def get_enriched_dataframe(csf_file="data/solarn_month.csv"):
 
 
 def predict_cv_and_plot_results(clf, params, data, df):
-    """ predict_cv_and_plot_results """
+    """ predict cv and plot results """
     y_max = df["y_max"].values
     y_min = df["y_min"].values
+    x_train1, x_test1, max_train, max_test = train_test_split(data, y_max, test_size=0.1, random_state=9)
+    x_train2, x_test2, min_train, min_test = train_test_split(data, y_min, test_size=0.1, random_state=9)
     # Initialize a stratified split of our dataset for the validation process
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=22)
+    gcv1 = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
+    gcv1.fit(x_train1, max_train)
+    pred_max = gcv1.predict(x_test1)
+    mse1 = mean_squared_error(max_test, pred_max)
+    pred_max = gcv1.predict(data) * 60
     gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
-    gcv.fit(data, y_max)
-    pred_max = gcv.predict(data) * 60
-    gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
-    gcv.fit(data, y_min)
+    gcv.fit(x_train2, min_train)
+    pred_min = gcv.predict(x_test2)
+    mse2 = mean_squared_error(min_test, pred_min)
     pred_min = gcv.predict(data) * 100
     class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
+    print(f"MSE for maximum using {class_name} = {mse1} , MSE for minimum = {mse2}")
     plt.figure(figsize=(16, 5))
     plt.title(f"{class_name} prediction")
     plt.plot(df['year_float'].values, df["sn_max"].values)
@@ -85,14 +94,30 @@ def predict_cv_and_plot_results(clf, params, data, df):
     plt.plot(df['year_float'].values, df["mean_12y"].values)
     plt.plot(df['year_float'].values, pred_max)
     plt.plot(df['year_float'].values, pred_min)
-    plt.show()
+    # plt.show()
+    score = (gcv1.best_score_ + gcv.best_score_) * 0.5
+    return score, gcv1.best_params_
 
 
-def find_best_classifier():
-    """ find best classifier """
+def evaluate_classifier(clf, data_scaled, df):
+    """ evaluate classifier """
+    y_max = df["y_max"].values
+    y_min = df["y_min"].values
+    max_ = df["sn_max"].values
+    sunspots = df["sunspots"].values
+    clf2 = deepcopy(clf)
+    clf2.fit(data_scaled, y_max)
+    predict_max = clf2.predict(data_scaled)
+    clf.fit(data_scaled, y_min)
+    predict_min = clf.predict(data_scaled)
+    return predict_max, predict_min, max_, sunspots
+
+
+def get_results_for_best_classifier():
+    """ get results for best classifier """
     df = get_enriched_dataframe()
+    times = df["year_float"].values
     cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y", "sn_mean", "sn_max", "sn_min"]
-
     data_scaled = StandardScaler().fit_transform(df[cols].values)
     params_lr = {'C': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
     params_rid = {'alpha': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
@@ -102,6 +127,7 @@ def find_best_classifier():
     params_knn = {"n_neighbors": [4, 5, 7, 8, 10, 12]}
     params_ada = {"n_estimators": [3, 4, 5, 7], "learning_rate": [0.2, 1., 9.9]}
     classifiers = [
+        (AdaBoostClassifier(), params_ada),
         (LogisticRegression(), params_lr),
         (RidgeClassifier(), params_rid),
         (GradientBoostingClassifier(), params),
@@ -109,8 +135,15 @@ def find_best_classifier():
         (DecisionTreeClassifier(), params_dt),
         (RandomForestClassifier(), params),
         (KNeighborsClassifier(), params_knn),
-        (AdaBoostClassifier(), params_ada),
         (ExtraTreesClassifier(), params),
     ]
+    max_score = 0.
+    results = (ExtraTreesClassifier(), {})
     for clf, parameters in classifiers:
-        predict_cv_and_plot_results(clf, parameters, data_scaled, df)
+        score, best_params = predict_cv_and_plot_results(clf, parameters, data_scaled, df)
+        if max_score < score:
+            max_score = score
+            results = (clf, best_params)
+    print(f"best model {str(results[0].__class__)} {results[1]}")
+    predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0], data_scaled, df)
+    return times, predict_max, predict_min, max_, sunspots
