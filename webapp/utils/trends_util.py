@@ -3,11 +3,9 @@ import numpy as np
 
 def min_index(series, start, interval):
     """ find min index """
-    min_ = 300
+    min_ = np.max(series) + 1.
     index = -1
-    for j in range(start, start + interval):
-        if j >= len(series):
-            break
+    for j in range(start, min(start + interval, len(series))):
         if series[j] < min_:
             index = j
             min_ = series[j]

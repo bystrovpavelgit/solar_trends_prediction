@@ -3,7 +3,6 @@
     business logic for trends prediction app
 """
 import logging
-
 from sqlite3 import IntegrityError
 from sqlalchemy.exc import SQLAlchemyError
 from webapp.user.models import User

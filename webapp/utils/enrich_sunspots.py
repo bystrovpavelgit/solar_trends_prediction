@@ -2,16 +2,13 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import hstack
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression, RidgeClassifier, RidgeCV
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, \
-    AdaBoostRegressor, ExtraTreesClassifier, RandomForestRegressor, \
-    GradientBoostingRegressor, ExtraTreesRegressor, BaggingClassifier, \
-    BaggingRegressor, RandomForestClassifier
-from sklearn.metrics import mean_squared_error, r2_score
+    ExtraTreesClassifier, BaggingClassifier, RandomForestClassifier
 from webapp.utils.trends_util import rolling_mean, find_minimums
 
 
@@ -91,26 +88,8 @@ def predict_cv_and_plot_results(clf, params, data, df):
     plt.show()
 
 
-def regression_with_cv_and_plot_results(clf, data, df, cols):
-    """ regression_with_cv_and_plot_results """
-    # ridge.fit(train_data_scaled, y_max)
-    # pred_rid = ridge.predict(train_data_scaled) * 50
-    # Initialize a stratified split of our dataset for the validation process
-    clf.fit(df[cols].values, data)
-    predict = clf.predict(df[cols].values)
-    class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
-    plt.figure(figsize=(16, 5))
-    plt.title(f"{class_name} prediction")
-    plt.plot(df['year_float'].values, df["sn_max"].values)
-    plt.plot(df['year_float'].values, df["mean_1y"].values)
-    plt.plot(df['year_float'].values, df["mean_12y"].values)
-    plt.plot(df['year_float'].values, predict)
-    plt.show()
-    print(mean_squared_error(data, predict), r2_score(data, predict))
-
-
 def find_best_classifier():
-    """ find_best_classifier """
+    """ find best classifier """
     df = get_enriched_dataframe()
     cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y", "sn_mean", "sn_max", "sn_min"]
 
@@ -135,29 +114,3 @@ def find_best_classifier():
     ]
     for clf, parameters in classifiers:
         predict_cv_and_plot_results(clf, parameters, data_scaled, df)
-
-
-def find_best_regressor():
-    """ find_best_regressor """
-    df = get_enriched_dataframe()
-    cols = ["observations", "mean_1y", "mean_3y", "mean_12y", "sn_mean", "sn_max", "sn_min"]
-    spots_data = df['sunspots'].values
-
-    reg = RandomForestRegressor()
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-
-    reg = GradientBoostingRegressor()
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-
-    reg = BaggingRegressor(DecisionTreeRegressor())
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-
-    reg = ExtraTreesRegressor()
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-
-    reg = AdaBoostRegressor()
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-
-    reg = RidgeCV(alphas=np.linspace(5, 200, 20) / 10)
-    regression_with_cv_and_plot_results(reg, spots_data, df, cols)
-    print(reg.coef_)
