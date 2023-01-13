@@ -6,17 +6,12 @@
 <div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
 
 <script>
-
 // Generate values
-var x1Values = {{ x }}
-var y1Values = {{ y }}
-var x2Values = {{ x2 }}
-var y2Values = {{ y2 }}
 
 // Define Data
 var data = [
-  {x: x1Values, y: y1Values, mode:"lines"},
-  {x: x2Values, y: y2Values, mode:"lines"}
+  {x: {{ x }} , y: {{ y }} , mode:"lines"},
+  {x: {{ x2 }} , y: {{ y2 }} , mode:"lines"}
 ];
 
 //Define Layout
