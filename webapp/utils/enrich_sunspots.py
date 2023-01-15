@@ -22,7 +22,7 @@ def fill_values(data, ndx, func):
     return result
 
 
-def get_enriched_dataframe(csf_file="data/solarn_month.csv"):
+def get_enriched_dataframe(csf_file="data/sunspot_numbers.csv"):
     """
        enrich dataframe with 1y, 3y and 128 months moving averages and
        with min, max and average number of sunspots
