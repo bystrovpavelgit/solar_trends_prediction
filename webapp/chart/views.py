@@ -13,6 +13,12 @@ def draw():
     return render_template("chart/chart.html", x=dat1.tolist(), y=dat2.tolist())
 
 
+@blueprint.route("/bar_plot")
+def bar_plot():
+    dat1, dat2 = create_line_plot()
+    return render_template("chart/barplot.html", time=dat1[-200:].tolist(), y=dat2[-200:].tolist())
+
+
 @blueprint.route("/next_cycle")
 def draw_next_cycle():
     """ draw next cycle """

@@ -28,7 +28,7 @@ class TestUser(unittest.TestCase):
 
     def test_create_line_plot(self):
         """ test create_line_plot """
-        data = pd.read_csv("data/solarn_month.csv", delimiter=";")
+        data = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
         year = data['year_float'].values.tolist()
         spots = data['sunspots'].values.tolist()
 

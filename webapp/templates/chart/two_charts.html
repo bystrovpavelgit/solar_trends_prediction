@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% extends "bootstrap.html" %}
+{% block content %}
 
-<body>
 <div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
 
 <script>
@@ -19,11 +17,10 @@ var data = [
 ];
 
 //Define Layout
-var layout = {title: "[Sunspot Number]"};
+var layout = {title: "[Sunspot Number]", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
 
 // Display using Plotly
 Plotly.newPlot("myPlot", data, layout);
 </script>
 
-</body>
-</html>
+{% endblock %}

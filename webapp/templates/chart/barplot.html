@@ -1,0 +1,21 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Define Data
+
+var data = [{
+  type: 'bar', x: {{ time }} , y: {{ y }} , name: 'number of sunspots', marker: { color: '#C8A2C8', line: { width: 2}}
+}];
+
+//Define Layout
+var layout = {title: "sunspots numbers for 200 months", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+var config = {responsive: true};
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout, config);
+
+</script>
+
+{% endblock %}

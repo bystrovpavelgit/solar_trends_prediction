@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% extends "bootstrap.html" %}
+{% block content %}
 
-<body>
 <div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
 
 <script>
@@ -18,19 +16,20 @@ var x4Val = {{ time }}
 var y4Val = {{ y4 }}
 
 // Define Data
+//var txt = {{ info.graph }}
+
 var data = [
-  {x: x1Val, y: y1Val, mode:"lines"},
-  {x: x2Val, y: y2Val, mode:"lines"},
-  {x: x3Val, y: y3Val, mode:"lines"},
-  {x: x4Val, y: y4Val, mode:"lines"},
+  {x: x1Val, y: y1Val, mode: 'lines+markers', name: 'predicted 1950 maximum'},
+  {x: x2Val, y: y2Val, mode: 'lines+markers', name: 'predicted Dalton minimum'},
+  {x: x3Val, y: y3Val, mode: "lines", name: '11y cycle maximum value'},
+  {x: x4Val, y: y4Val, mode: "lines", name: 'number of sunspots'},
 ];
 
 //Define Layout
-var layout = {title: "[Sunspot Number]"};
+var layout = {title: "Adaboost classifier predictions for max and min", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
 
 // Display using Plotly
 Plotly.newPlot("myPlot", data, layout);
 </script>
 
-</body>
-</html>
+{% endblock %}

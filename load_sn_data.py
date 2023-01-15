@@ -5,7 +5,7 @@ from sqlite3 import IntegrityError
 from sqlalchemy.exc import SQLAlchemyError, PendingRollbackError
 from webapp import create_app
 from webapp.db import DB
-from webapp.stat.models import SunspotNumbers
+from webapp.user.models import SunspotNumbers
 from webapp.utils.enrich_sunspots import get_enriched_dataframe
 
 columns_ = ["year_float",
@@ -48,15 +48,21 @@ def insert_sunspots(data):
             DB.session.rollback()
 
 
-def process_from_file(name="data/authors.csv"):
+def process_from_file(name="data/sunspot_numbers_enriched.csv"):
     """ process authors from file """
     columns = ["Year",
                "month",
                "year_float",
                "sunspots",
-               "std"
+               "std",
                "observations",
-               "def_or_prov"]
+               "def_or_prov",
+               "mean_1y",
+               "mean_3y",
+               "mean_12y",
+               "sunspots_max",
+               "sunspots_min",
+               "sunspots_avg"]
     mapping = []
     try:
         with open(name, "r", encoding="utf-8") as fil:
@@ -70,8 +76,8 @@ def process_from_file(name="data/authors.csv"):
 
 if __name__ == "__main__":
     app = create_app()
+    df = get_enriched_dataframe(csf_file="data/sunspot_numbers.csv")
+    df.to_csv("data/sunspot_numbers_enriched.csv", sep=";", index=False)
     with app.app_context():
-        df = get_enriched_dataframe(csf_file="data/sunspot_numbers.csv")
-        df.to_csv("data/sunspot_numbers_enriched.csv", sep=";", index=False)
         res = process_from_file(name="data/sunspot_numbers_enriched.csv")
         print(f"{len(res)} sunspot numbers loaded")

@@ -24,7 +24,7 @@ SUNSPOTS_MODEL = load_rnn_model(file_name="models/sn_2lvl_rnn.h5")
 
 def create_line_plot():
     """ create line plot """
-    df = pd.read_csv("data/solarn_month.csv", delimiter=";")
+    df = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
     return df['year_float'].values, df['sunspots'].values
 
 

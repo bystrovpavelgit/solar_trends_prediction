@@ -1,0 +1,24 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Generate values
+//var txt = {{ info.graph }}
+// Define Data
+
+var data = [
+  {x: {{ time }} , y: {{ y }} , mode: 'lines', name: 'number of sunspots'},
+  {x: {{ time }} , y: {{ y2 }} , mode: 'lines', name: 'average 3 years'},
+  {x: {{ time }} , y: {{ y3 }} , mode: 'lines', name: 'average 128 months'}
+];
+
+//Define Layout
+var layout = {title: "Moving average for sunspots numbers", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+
+{% endblock %}

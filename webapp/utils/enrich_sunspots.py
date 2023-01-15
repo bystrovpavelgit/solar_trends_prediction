@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-from copy import deepcopy
-from matplotlib import pyplot as plt
 from numpy import hstack
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, \
     ExtraTreesClassifier, BaggingClassifier, RandomForestClassifier
@@ -87,14 +85,6 @@ def predict_cv_and_plot_results(clf, params, data, df):
     pred_min = gcv.predict(data) * 100
     class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
     print(f"MSE for maximum using {class_name} = {mse1} , MSE for minimum = {mse2}")
-    plt.figure(figsize=(16, 5))
-    plt.title(f"{class_name} prediction")
-    plt.plot(df['year_float'].values, df["sn_max"].values)
-    plt.plot(df['year_float'].values, df["mean_1y"].values)
-    plt.plot(df['year_float'].values, df["mean_12y"].values)
-    plt.plot(df['year_float'].values, pred_max)
-    plt.plot(df['year_float'].values, pred_min)
-    # plt.show()
     score = (gcv1.best_score_ + gcv.best_score_) * 0.5
     return score, gcv1.best_params_
 
@@ -105,7 +95,7 @@ def evaluate_classifier(clf, data_scaled, df):
     y_min = df["y_min"].values
     max_ = df["sn_max"].values
     sunspots = df["sunspots"].values
-    clf2 = deepcopy(clf)
+    clf2 = clf
     clf2.fit(data_scaled, y_max)
     predict_max = clf2.predict(data_scaled)
     clf.fit(data_scaled, y_min)
