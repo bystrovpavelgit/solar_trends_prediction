@@ -3,20 +3,22 @@
     deep learning logic
 """
 import logging
+from copy import copy
 import numpy as np
 import pandas as pd
-from copy import copy
 from numpy import hstack
 from tensorflow import keras
 
 
 def load_rnn_model(file_name="models/sn_2lvl_rnn.h5"):
     """ load rnn model """
+    model = None
     try:
         model = keras.models.load_model(file_name)
-        return model
     except FileNotFoundError:
-        logging.error(f"No such file or directory {file_name}")
+        msg = f"No such file or directory {file_name}"
+        logging.error(msg)
+    return model
 
 
 SUNSPOTS_MODEL = load_rnn_model(file_name="models/sn_2lvl_rnn.h5")
@@ -24,8 +26,10 @@ SUNSPOTS_MODEL = load_rnn_model(file_name="models/sn_2lvl_rnn.h5")
 
 def create_line_plot():
     """ create line plot """
-    df = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
-    return df['year_float'].values, df['sunspots'].values
+    data = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
+    year_float = data['year_float'].values
+    sunspots = data['sunspots'].values
+    return year_float, sunspots
 
 
 def predict_next_cycle(data, timeseries):
@@ -39,9 +43,11 @@ def predict_next_cycle(data, timeseries):
 
 
 def predict_two_cycles(data, timeseries):
-    """ predict next solar cycle """
+    """ predict next two solar cycles """
     result, res_ts = predict_next_cycle(data, timeseries)
     next_data = hstack([data, result])[-data.shape[0]:]
     next_ts = hstack([timeseries, res_ts])[-data.shape[0]:]
-    result2, res_ts2 = predict_next_cycle(next_data, next_ts)
-    return hstack([next_data, result2]), hstack([res_ts, res_ts2])
+    pred2, pred_ts2 = predict_next_cycle(next_data, next_ts)
+    result2 = hstack([next_data, pred2])
+    res_ts2 = hstack([res_ts, pred_ts2])
+    return result2, res_ts2

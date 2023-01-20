@@ -1,3 +1,4 @@
+""" trends modification utility """
 import numpy as np
 
 
@@ -13,7 +14,7 @@ def min_index(series, start, interval):
 
 
 def find_minimums(series, length):
-    """ find all minimums in series"""
+    """ find all minimums in series """
     k = len(series) // length
     if len(series) > k * length:
         k += 1
@@ -21,19 +22,19 @@ def find_minimums(series, length):
     return result
 
 
-def moving_average(series, n):
+def moving_average(series, num):
     """
         Calculate average of last n observations
     """
-    avg = np.average(series[-n:])
+    avg = np.average(series[-num:])
     return avg
 
 
-def rolling_mean(series, n):
+def rolling_mean(series, num):
     """
         Calculate average of last n observations
     """
-    mean_window_n = series.rolling(window=n).mean()
+    mean_window_n = series.rolling(window=num).mean()
     return mean_window_n
 
 
@@ -44,8 +45,8 @@ def exponential_smoothing(series, alpha):
         :attr:`alpha` - float [0.0, 1.0], smoothing parameter for level
     """
     result = [series[0]]  # first value is same as series
-    for n in range(1, len(series)):
-        result.append(alpha * series[n] + (1 - alpha) * result[n - 1])
+    for num in range(1, len(series)):
+        result.append(alpha * series[num] + (1 - alpha) * result[num - 1])
     return result
 
 
@@ -59,35 +60,19 @@ def double_exponential_smoothing(series, alpha, beta):
     # first value is same as series
     result = [series[0]]
     level, trend = 0, 0
-    for n in range(1, len(series) + 1):
-        if n == 1:
+    for num in range(1, len(series) + 1):
+        if num == 1:
             level = series[0]
             trend = series[1] - series[0]
-        if n >= len(series):  # forecasting
+        if num >= len(series):  # forecasting
             value = result[-1]
         else:
-            value = series[n]
+            value = series[num]
         last_level = level
         level = alpha * value + (1 - alpha) * (level + trend)
         trend = beta * (level - last_level) + (1 - beta) * trend
         result.append(level + trend)
     return result
-
-
-def plot_moving_average(series, window):
-    """
-        series - dataframe with timeseries
-        window - rolling window size
-        plot_intervals - show confidence intervals
-        plot_anomalies - show anomalies
-
-    """
-    import matplotlib.pyplot as plt
-    mean = series.rolling(window=window).mean()
-
-    plt.figure(figsize=(15, 5))
-    plt.title("Moving average\n window size = {}".format(window))
-    plt.plot(mean, "g", label="Rolling mean trend")
 
 
 class HoltWinters:
@@ -99,11 +84,13 @@ class HoltWinters:
     :attr:beta - Holt-Winters model coefficient beta
     :attr:gamma - Holt-Winters model coefficient gamma
     :attr:n_preds - predictions horizon
-    :attr:scaling_factor - sets the width of the confidence interval by Brutlag (usually takes values from 2 to 3)
+    :attr:scaling_factor - sets the width of the confidence interval by Brutlag
+                (usually takes values from 2 to 3)
     """
 
     def __init__(self, series, season_len, alpha, beta, gamma, n_preds,
                  scaling_factor=1.96):
+        """ init """
         self.series = series
         self.slen = season_len
         self.alpha = alpha
@@ -116,16 +103,18 @@ class HoltWinters:
         self.Season = []
         self.Trend = []
         self.PredictedDeviation = []
-        self.UpperBond = []
-        self.LowerBond = []
+        self.upper_bond = []
+        self.lower_bond = []
 
     def initial_trend(self):
+        """ initial trend """
         sum_ = 0.0
         for i in range(self.slen):
             sum_ += float(self.series[i + self.slen] - self.series[i]) / self.slen
         return sum_ / self.slen
 
     def initial_seasonal_components(self):
+        """ initial_seasonal_components """
         seasonals = {}
         season_averages = []
         n_seasons = int(len(self.series) / self.slen)
@@ -146,13 +135,14 @@ class HoltWinters:
         return seasonals
 
     def triple_exponential_smoothing(self):
+        """ triple exponential smoothing """
         self.result = []
         self.Smooth = []
         self.Season = []
         self.Trend = []
         self.PredictedDeviation = []
-        self.UpperBond = []
-        self.LowerBond = []
+        self.upper_bond = []
+        self.lower_bond = []
 
         seasonals = self.initial_seasonal_components()
         smooth, trend = 0, 0
@@ -165,17 +155,17 @@ class HoltWinters:
                 self.Trend.append(trend)
                 self.Season.append(seasonals[i % self.slen])
                 self.PredictedDeviation.append(0)
-                self.UpperBond.append(
+                self.upper_bond.append(
                     self.result[0] + self.scaling_factor * self.PredictedDeviation[0]
                 )
-                self.LowerBond.append(
+                self.lower_bond.append(
                     self.result[0] - self.scaling_factor * self.PredictedDeviation[0]
                 )
                 continue
 
             if i >= len(self.series):
-                m = i - len(self.series) + 1
-                self.result.append((smooth + m * trend) + seasonals[i % self.slen])
+                num = i - len(self.series) + 1
+                self.result.append((smooth + num * trend) + seasonals[i % self.slen])
                 # when predicting we increase uncertainty on each step
                 self.PredictedDeviation.append(self.PredictedDeviation[-1] * 1.01)
             else:
@@ -197,10 +187,10 @@ class HoltWinters:
                     + (1 - self.gamma) * self.PredictedDeviation[-1]
                 )
 
-            self.UpperBond.append(
+            self.upper_bond.append(
                 self.result[-1] + self.scaling_factor * self.PredictedDeviation[-1]
             )
-            self.LowerBond.append(
+            self.lower_bond.append(
                 self.result[-1] - self.scaling_factor * self.PredictedDeviation[-1]
             )
             self.Smooth.append(smooth)
