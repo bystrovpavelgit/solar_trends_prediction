@@ -6,7 +6,7 @@ import logging
 import os
 from datetime import timedelta
 
-logging.basicConfig(filename='webapp.log', level=logging.DEBUG)
+logging.basicConfig(filename='webapp.log', level=logging.INFO)
 basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir,
                                                       "..",
