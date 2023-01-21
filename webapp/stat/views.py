@@ -8,7 +8,8 @@ blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
 
 @blueprint.route("/rolling_means")
-def rolling_mean():
+def rolling_means():
+    """ rolling means """
     df = get_enriched_dataframe()
     info = {'graph': 'Moving average for sunspots numbers'}
     time = df["year_float"].values.tolist()
@@ -24,25 +25,27 @@ def rolling_mean():
                            y3=y3[:period])
 
 
-@blueprint.route("/exp_smooth")
-def rolling_mean():
+@blueprint.route("/exp_smoothing")
+def exp_smoothing():
+    """ exponential smoothing """
     df = get_enriched_dataframe()
     info = {'graph': 'Moving average for sunspots numbers'}
     time = df["year_float"].values.tolist()
-    period = len(time)
+    period = 1200  # show 100 years
     y1 = df["sunspots"].values.tolist()
-    y2 = exponential_smoothing(df["sunspots"], .9).values.tolist()
-    y3 = double_exponential_smoothing(df["sunspots"], .9, .9).values.tolist()
-    return render_template("stat/charts.html",
+    y2 = exponential_smoothing(df["sunspots"], .25)
+    y3 = double_exponential_smoothing(df["sunspots"], .2, .2)
+    return render_template("stat/exp_smoothing.html",
                            info=info,
-                           time=time,
-                           y=y1[:period],
-                           y2=y2[:period],
-                           y3=y3[:period])
+                           time=time[-period:],
+                           y=y1[-period:],
+                           y2=y2[-period:],
+                           y3=y3[-period:])
 
 
 @blueprint.route("/best")
 def best_model():
+    """ function to find best ML model """
     info = {'graph': 'Adaboost classifier predictions for max and min'}
     time, pmax, pmin, max_, sunspots = get_results_for_best_classifier()
     period = len(time)

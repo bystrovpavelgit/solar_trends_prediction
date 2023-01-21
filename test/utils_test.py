@@ -15,7 +15,6 @@ class TestUser(unittest.TestCase):
 
     def test_sum(self):
         """ summation юнит-тест """
-        print("юнит-тест sum\n")
         self.assertEqual(sum([3, 2]), 5, "равен 5")
 
     def test_get_user_by_name(self):

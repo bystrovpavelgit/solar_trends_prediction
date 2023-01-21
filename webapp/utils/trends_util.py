@@ -1,11 +1,14 @@
 """ trends modification utility """
 import numpy as np
+from numpy import array
 
 
-def min_index(series, start, interval):
+def min_index(series: array, start: int, interval: int) -> int:
     """ find min index """
-    min_ = np.max(series) + 1.
     index = -1
+    if len(series) == 0:
+        return index
+    min_ = np.max(series) + 1.
     for j in range(start, min(start + interval, len(series))):
         if series[j] < min_:
             index = j
@@ -13,7 +16,7 @@ def min_index(series, start, interval):
     return index
 
 
-def find_minimums(series, length):
+def find_minimums(series: array, length: int) -> list:
     """ find all minimums in series """
     k = len(series) // length
     if len(series) > k * length:
