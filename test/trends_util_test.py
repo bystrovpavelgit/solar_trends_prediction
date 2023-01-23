@@ -4,7 +4,8 @@ import unittest
 import numpy as np
 import pandas as pd
 from webapp.utils.trends_util import moving_average, rolling_mean, \
-    exponential_smoothing, double_exponential_smoothing, min_index
+    exponential_smoothing, double_exponential_smoothing, min_index,\
+    find_minimums
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -70,3 +71,19 @@ class TrendsUtilTest(unittest.TestCase):
         index = min_index(empty, 0, 9)
 
         self.assertEqual(index, -1, "min_index равен -1")
+
+    def test_find_minimums_negatively(self):
+        """ негативный юнит-тест для min_index """
+        empty = np.array([])
+
+        arr = find_minimums(empty, 9)
+
+        self.assertEqual(arr, [], "minimums = []")
+
+    def test_find_minimums_positively(self):
+        """ негативный юнит-тест для min_index """
+        inp = np.array([2, 3, 5, 5, 3, 1, 2])
+
+        arr = find_minimums(inp, 7)
+
+        self.assertEqual(arr, [5], "minimums равен [5]")
