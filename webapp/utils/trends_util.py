@@ -1,6 +1,9 @@
 """ trends modification utility """
 import numpy as np
 from numpy import array
+from scipy.optimize import minimize
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
 
 
 def min_index(series: array, start: int, interval: int) -> int:
@@ -199,3 +202,37 @@ class HoltWinters:
             self.Smooth.append(smooth)
             self.Trend.append(trend)
             self.Season.append(seasonals[i % self.slen])
+
+
+def timeseriesCVscore(data, x):
+    """ timeseries CV score """
+    errors = []
+    values = data.values
+    alpha, beta, gamma = x
+    # задаём число фолдов для кросс-валидации
+    tscv = TimeSeriesSplit(n_splits=3)
+    # идем по фолдам, на каждом обучаем модель, строим прогноз на отложенной выборке и считаем ошибку
+    for train, test in tscv.split(values):
+        model = HoltWinters(
+            series=values[train],
+            season_len=128,
+            alpha=alpha,
+            beta=beta,
+            gamma=gamma,
+            n_preds=len(test),
+        )
+        model.triple_exponential_smoothing()
+        predictions = model.result[-len(test):]
+        actual = values[test]
+        error = mean_squared_error(predictions, actual)
+        errors.append(error)
+    return np.mean(np.array(errors))
+
+
+def get_optimal_params(dataset):
+    """ get optimal params """
+    # инициализируем значения параметров
+    x = np.array([0, 0, 0])
+    # Минимизируем функцию потерь с ограничениями на параметры
+    opt = minimize(timeseriesCVscore, x0=x, method="TNC", bounds=((0, 1), (0, 1), (0, 1)))
+    return opt.x

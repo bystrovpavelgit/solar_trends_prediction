@@ -16,6 +16,11 @@ from webapp.utils.trends_util import rolling_mean, find_minimums
 
 def fill_values(data, ndx, func):
     """ fill values from array :attr:`data` using function :attr:`func` """
+    if len(data) < 2:
+        return data
+    for index_ in ndx:
+        if index_ > len(data):
+            return np.array([])
     vals = [np.ones((ndx[j + 1] - ndx[j])) * func(data[ndx[j]:ndx[j + 1]])
             for j in range(len(ndx) - 1)]
     result = hstack(vals)
