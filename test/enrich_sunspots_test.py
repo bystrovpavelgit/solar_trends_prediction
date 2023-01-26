@@ -54,6 +54,16 @@ class EnrichSunspotsTest(unittest.TestCase):
         csv = "data/sunspot_numbers.csv"
 
         data = get_enriched_dataframe(csv_file=csv)
-        print(data.columns)
 
-        self.assertEqual(data.columns, data.columns, "")
+        self.assertTrue("year_float" in data.columns)
+        self.assertTrue("Year" in data.columns)
+        self.assertTrue("sunspots" in data.columns)
+        self.assertTrue("observations" in data.columns)
+        self.assertTrue("mean_1y" in data.columns)
+        self.assertTrue("mean_3y" in data.columns)
+        self.assertTrue("mean_12y" in data.columns)
+        self.assertTrue("sn_mean" in data.columns)
+        self.assertTrue("sn_max" in data.columns)
+        self.assertTrue("sn_min" in data.columns)
+        self.assertTrue("y_min" in data.columns)
+        self.assertTrue("y_max" in data.columns)
