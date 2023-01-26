@@ -27,12 +27,12 @@ def fill_values(data, ndx, func):
     return result
 
 
-def get_enriched_dataframe(csf_file="data/sunspot_numbers.csv"):
+def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     """
        enrich dataframe with 1y, 3y and 128 months moving averages and
        with min, max and average number of sunspots
     """
-    data = pd.read_csv(csf_file, delimiter=";")
+    data = pd.read_csv(csv_file, delimiter=";")
     trend = data['sunspots'].values
     # calculate moving average
     data["mean_1y"] = rolling_mean(data['sunspots'], 12)

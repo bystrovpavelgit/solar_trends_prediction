@@ -1,7 +1,8 @@
 """ enrich sunspots tests """
 import unittest
 import numpy as np
-from webapp.utils.enrich_sunspots import fill_values
+from webapp.utils.enrich_sunspots import fill_values, \
+    get_enriched_dataframe
 
 
 class EnrichSunspotsTest(unittest.TestCase):
@@ -47,3 +48,12 @@ class EnrichSunspotsTest(unittest.TestCase):
         filled = fill_values(data, indices, np.mean)
 
         self.assertEqual(len(filled), 0, "empty")
+
+    def test_get_enriched_dataframe(self):
+        """ test get_enriched_dataframe function csv_file="data/sunspot_numbers.csv" """
+        csv = "data/sunspot_numbers.csv"
+
+        data = get_enriched_dataframe(csv_file=csv)
+        print(data.columns)
+
+        self.assertEqual(data.columns, data.columns, "")
