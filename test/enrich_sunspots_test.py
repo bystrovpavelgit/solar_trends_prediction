@@ -67,3 +67,13 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertTrue("sn_min" in data.columns)
         self.assertTrue("y_min" in data.columns)
         self.assertTrue("y_max" in data.columns)
+
+    def test_get_enriched_dataframe_negatively(self):
+        """ test get_enriched_dataframe function csv_file="data/sunspot_numbers.csv" """
+        csv = "none.csv"
+
+        try:
+            get_enriched_dataframe(csv_file=csv)
+
+        except FileNotFoundError as err:
+            self.assertEqual(err.strerror, "No such file or directory")
