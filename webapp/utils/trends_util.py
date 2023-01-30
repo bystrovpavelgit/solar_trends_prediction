@@ -1,4 +1,5 @@
 """ trends modification utility """
+from functools import partial
 import numpy as np
 from numpy import array
 from scipy.optimize import minimize
@@ -106,9 +107,9 @@ class HoltWinters:
         self.scaling_factor = scaling_factor
         self.result = []
         self.Smooth = []
-        self.Season = []
-        self.Trend = []
-        self.PredictedDeviation = []
+        self.seasons = []
+        self.trends = []
+        self.predicted_deviation = []
         self.upper_bond = []
         self.lower_bond = []
 
@@ -117,7 +118,8 @@ class HoltWinters:
         sum_ = 0.0
         for i in range(self.slen):
             sum_ += float(self.series[i + self.slen] - self.series[i]) / self.slen
-        return sum_ / self.slen
+        res = sum_ / self.slen
+        return res
 
     def initial_seasonal_components(self):
         """ initial_seasonal_components """
@@ -144,9 +146,9 @@ class HoltWinters:
         """ triple exponential smoothing """
         self.result = []
         self.Smooth = []
-        self.Season = []
-        self.Trend = []
-        self.PredictedDeviation = []
+        self.seasons = []
+        self.trends = []
+        self.predicted_deviation = []
         self.upper_bond = []
         self.lower_bond = []
 
@@ -158,14 +160,14 @@ class HoltWinters:
                 trend = self.initial_trend()
                 self.result.append(self.series[0])
                 self.Smooth.append(smooth)
-                self.Trend.append(trend)
-                self.Season.append(seasonals[i % self.slen])
-                self.PredictedDeviation.append(0)
+                self.trends.append(trend)
+                self.seasons.append(seasonals[i % self.slen])
+                self.predicted_deviation.append(0)
                 self.upper_bond.append(
-                    self.result[0] + self.scaling_factor * self.PredictedDeviation[0]
+                    self.result[0] + self.scaling_factor * self.predicted_deviation[0]
                 )
                 self.lower_bond.append(
-                    self.result[0] - self.scaling_factor * self.PredictedDeviation[0]
+                    self.result[0] - self.scaling_factor * self.predicted_deviation[0]
                 )
                 continue
 
@@ -173,7 +175,7 @@ class HoltWinters:
                 num = i - len(self.series) + 1
                 self.result.append((smooth + num * trend) + seasonals[i % self.slen])
                 # when predicting we increase uncertainty on each step
-                self.PredictedDeviation.append(self.PredictedDeviation[-1] * 1.01)
+                self.predicted_deviation.append(self.predicted_deviation[-1] * 1.01)
             else:
                 val = self.series[i]
                 last_smooth, smooth = (
@@ -188,37 +190,34 @@ class HoltWinters:
                 )
                 self.result.append(smooth + trend + seasonals[i % self.slen])
                 # Deviation is calculated according to Brutlag algorithm.
-                self.PredictedDeviation.append(
+                self.predicted_deviation.append(
                     self.gamma * np.abs(self.series[i] - self.result[i])
-                    + (1 - self.gamma) * self.PredictedDeviation[-1]
+                    + (1 - self.gamma) * self.predicted_deviation[-1]
                 )
 
             self.upper_bond.append(
-                self.result[-1] + self.scaling_factor * self.PredictedDeviation[-1]
+                self.result[-1] + self.scaling_factor * self.predicted_deviation[-1]
             )
             self.lower_bond.append(
-                self.result[-1] - self.scaling_factor * self.PredictedDeviation[-1]
+                self.result[-1] - self.scaling_factor * self.predicted_deviation[-1]
             )
             self.Smooth.append(smooth)
-            self.Trend.append(trend)
-            self.Season.append(seasonals[i % self.slen])
+            self.trends.append(trend)
+            self.seasons.append(seasonals[i % self.slen])
 
 
-def timeseriesCVscore(data, x):
+def timeseries_cv_score(values, params):
     """ timeseries CV score """
     errors = []
-    values = data.values
-    alpha, beta, gamma = x
-    # задаём число фолдов для кросс-валидации
     tscv = TimeSeriesSplit(n_splits=3)
-    # идем по фолдам, на каждом обучаем модель, строим прогноз на отложенной выборке и считаем ошибку
+    # строим прогноз на отложенной выборке и считаем ошибку
     for train, test in tscv.split(values):
         model = HoltWinters(
             series=values[train],
             season_len=128,
-            alpha=alpha,
-            beta=beta,
-            gamma=gamma,
+            alpha=params[0],
+            beta=params[1],
+            gamma=params[2],
             n_preds=len(test),
         )
         model.triple_exponential_smoothing()
@@ -226,13 +225,32 @@ def timeseriesCVscore(data, x):
         actual = values[test]
         error = mean_squared_error(predictions, actual)
         errors.append(error)
-    return np.mean(np.array(errors))
+    mse = np.mean(np.array(errors))
+    return mse
 
 
-def get_optimal_params(dataset):
+def get_optimal_params(data):
     """ get optimal params """
-    # инициализируем значения параметров
-    x = np.array([0, 0, 0])
-    # Минимизируем функцию потерь с ограничениями на параметры
-    opt = minimize(timeseriesCVscore, x0=x, method="TNC", bounds=((0, 1), (0, 1), (0, 1)))
-    return opt.x
+    args = np.array([0, 0, 0])
+    timeseries_cv_func = partial(timeseries_cv_score, data.values)
+    # минимизируем L
+    opt = minimize(timeseries_cv_func, x0=args, method="TNC",
+                   bounds=((0, 1), (0, 1), (0, 1)))
+    result = opt.x
+    return result
+
+
+def triple_exponential_smoothing_(data, sess_len=128):
+    """ triple exponential smoothing using Holt-Winters model """
+    opt_params = get_optimal_params(data)
+    model = HoltWinters(
+        data[:-sess_len],
+        season_len=sess_len,
+        alpha=opt_params[0],
+        beta=opt_params[1],
+        gamma=opt_params[2],
+        n_preds=sess_len,
+        scaling_factor=2.56)
+    model.triple_exponential_smoothing()
+    predictions = model.result
+    return predictions

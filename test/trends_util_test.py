@@ -1,11 +1,11 @@
 """ Trends Util unit-tests """
 import unittest
-
 import numpy as np
 import pandas as pd
-from webapp.utils.trends_util import moving_average, rolling_mean, \
-    exponential_smoothing, double_exponential_smoothing, min_index,\
-    find_minimums
+from webapp.utils.enrich_sunspots import get_enriched_dataframe
+from webapp.utils.trends_util import moving_average, rolling_mean, min_index,\
+    exponential_smoothing, double_exponential_smoothing, find_minimums, \
+    get_optimal_params
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -87,3 +87,13 @@ class TrendsUtilTest(unittest.TestCase):
         arr = find_minimums(inp, 7)
 
         self.assertEqual(arr, [5], "minimums равен [5]")
+
+    def test_get_optimal_params(self):
+        """ юнит-тест для get_optimal_params func """
+        dataset = get_enriched_dataframe()
+
+        alpha, beta, gamma = get_optimal_params(dataset.sunspots)
+
+        self.assertTrue(alpha > 0., "alpha > 0")
+        self.assertTrue(beta >= 0., "beta >= 0")
+        self.assertTrue(gamma > 0., "gamma > 0.")
