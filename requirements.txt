@@ -1,0 +1,13 @@
+unittest
+numpy
+plotly
+Flask
+Flask-WTF
+Werkzeug
+WTForms
+flask_login
+flask_sqlalchemy
+pandas
+scipy
+sklearn
+tensorflow

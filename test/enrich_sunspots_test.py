@@ -1,8 +1,10 @@
 """ enrich sunspots tests """
 import unittest
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
 from webapp.utils.enrich_sunspots import fill_values, \
-    get_enriched_dataframe
+    get_enriched_dataframe, predict_cv_and_plot_results
 
 
 class EnrichSunspotsTest(unittest.TestCase):
@@ -74,6 +76,23 @@ class EnrichSunspotsTest(unittest.TestCase):
 
         try:
             get_enriched_dataframe(csv_file=csv)
-
         except FileNotFoundError as err:
             self.assertEqual(err.strerror, "No such file or directory")
+
+    def test_predict_cv_and_plot_results(self):
+        """ test_predict_cv_and_plot_results """
+        clsf = RandomForestClassifier()
+        params = {"n_estimators": [3, 4, 5, 7], "max_depth": [3, 4, 5, 6, 9]}
+        dframe = get_enriched_dataframe()
+        cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y",
+                "sn_mean", "sn_max", "sn_min"]
+        data_scaled = StandardScaler().fit_transform(dframe[cols].values)
+
+        score, best_params = predict_cv_and_plot_results(clsf,
+                                                         params,
+                                                         data_scaled,
+                                                         dframe)
+
+        self.assertTrue(score > 0.9)
+        self.assertTrue(best_params['max_depth'] >= 4)
+        self.assertTrue(best_params['n_estimators'] >= 3)
