@@ -3,15 +3,23 @@ import unittest
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
+from xgboost import XGBClassifier
 from webapp.utils.enrich_sunspots import fill_values, \
-    get_enriched_dataframe, predict_cv_and_plot_results
+    get_enriched_dataframe, predict_using_cross_validation
 
 
 class EnrichSunspotsTest(unittest.TestCase):
     """ enrich sunspots tests """
+
     def setUp(self):
         """ set Up"""
-        self.num = 5
+        self.params = {"n_estimators": [3, 4, 5, 7],
+                       "max_depth": [3, 4, 5, 6, 9]}
+        self.dframe = get_enriched_dataframe()
+        cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y",
+                "sn_mean", "sn_max", "sn_min"]
+        self.data_scaled = StandardScaler().fit_transform(
+            self.dframe[cols].values)
 
     def test_fill_values(self):
         """ test fill values """
@@ -79,20 +87,30 @@ class EnrichSunspotsTest(unittest.TestCase):
         except FileNotFoundError as err:
             self.assertEqual(err.strerror, "No such file or directory")
 
-    def test_predict_cv_and_plot_results(self):
+    def test_predict_cv_and_plot_results1(self):
         """ test_predict_cv_and_plot_results """
         clsf = RandomForestClassifier()
-        params = {"n_estimators": [3, 4, 5, 7], "max_depth": [3, 4, 5, 6, 9]}
-        dframe = get_enriched_dataframe()
-        cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y",
-                "sn_mean", "sn_max", "sn_min"]
-        data_scaled = StandardScaler().fit_transform(dframe[cols].values)
+        scaled = self.data_scaled
 
-        score, best_params = predict_cv_and_plot_results(clsf,
-                                                         params,
-                                                         data_scaled,
-                                                         dframe)
+        score, best_params = predict_using_cross_validation(clsf,
+                                                            self.params,
+                                                            scaled,
+                                                            self.dframe)
 
-        self.assertTrue(score > 0.9)
+        self.assertTrue(score > 0.92)
         self.assertTrue(best_params['max_depth'] >= 4)
+        self.assertTrue(best_params['n_estimators'] >= 3)
+
+    def test_predict_cv_and_plot_results2(self):
+        """ test_predict_cv_and_plot_results """
+        clsf = XGBClassifier(random_state=17)
+        scaled = self.data_scaled
+
+        score, best_params = predict_using_cross_validation(clsf,
+                                                            self.params,
+                                                            scaled,
+                                                            self.dframe)
+
+        self.assertTrue(score > 0.91)
+        self.assertTrue(best_params['max_depth'] >= 3)
         self.assertTrue(best_params['n_estimators'] >= 3)

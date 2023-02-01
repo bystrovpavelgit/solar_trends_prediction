@@ -72,7 +72,7 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     return data
 
 
-def predict_cv_and_plot_results(clf, params, data, dframe):
+def predict_using_cross_validation(clf, params, data, dframe):
     """ predict cv and plot results """
     y_max = dframe["y_max"].values
     y_min = dframe["y_min"].values
@@ -138,7 +138,7 @@ def get_results_for_best_classifier():
     max_score = 0.
     results = (ExtraTreesClassifier(), {})
     for clf, parameters in classifiers:
-        score, best_params = predict_cv_and_plot_results(clf, parameters, data_scaled, dframe)
+        score, best_params = predict_using_cross_validation(clf, parameters, data_scaled, dframe)
         if max_score < score:
             max_score = score
             results = (clf, best_params)
