@@ -19,23 +19,41 @@
         <a class="nav-link" href="/chart/chart">График солнечных пятен</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/chart/bar_plot">Солнечные пятна за 200 месяцев</a>
+        <a class="nav-link" href="/chart/bar_plot">Солнечные пятна за 17 лет</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/chart/next_cycle">Прогноз на 11 лет</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/chart/two_cycles">Прогноз на 22 года</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/stat/rolling_means">График скользящих средних</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/stat/exp_smoothing">График экспоненциально сглаженных данных</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/stat/best">Предсказания минимума и максимума</a>
-      </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Прогнозы
+          </a>
+          <ul class="dropdown-menu">
+              <li class="nav-item">
+                <a class="nav-link" href="/chart/next_cycle">Прогноз на 11 лет</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/chart/two_cycles">Прогноз на 22 года</a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li class="nav-item">
+                <a class="nav-link" href="/stat/best">Предсказания минимума и максимума</a>
+              </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Сглаженных Данные
+          </a>
+          <ul class="dropdown-menu">
+              <li class="nav-item">
+                <a class="nav-link" href="/stat/rolling_means">График скользящих средних</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/stat/exp_smoothing">График с экспоненциальным сглаживанием</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/stat/holt_winters">График с тройным экспоненциальным сглаживанием</a>
+              </li>
+          </ul>
+        </li>
     </ul>
   </div>
 </nav>
