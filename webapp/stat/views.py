@@ -3,7 +3,7 @@ from flask import Blueprint, render_template
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
-    double_exponential_smoothing, triple_exponential_smoothing_
+    double_exponential_smoothing, hw_exponential_smoothing
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
@@ -48,7 +48,7 @@ def holt_winters():
     data = get_enriched_dataframe()
     time = data["year_float"].values.tolist()
     sunspots = data["sunspots"].values.tolist()
-    triple = triple_exponential_smoothing_(data.sunspots)
+    triple = hw_exponential_smoothing(data.sunspots)
     return render_template("stat/triple_smoothing.html",
                            time=time,
                            y=sunspots,

@@ -2,6 +2,7 @@
 from functools import partial
 import numpy as np
 from numpy import array, fft
+from pandas import Series
 from scipy.optimize import minimize
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
@@ -248,7 +249,7 @@ def get_optimal_params(data):
     return result
 
 
-def triple_exponential_smoothing_(data, sess_len=128):
+def hw_exponential_smoothing(data: Series, sess_len: int = 128) -> list:
     """ triple exponential smoothing using Holt-Winters model """
     opt_params = get_optimal_params(data)
     model = HoltWinters(

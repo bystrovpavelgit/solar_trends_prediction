@@ -5,7 +5,7 @@ import pandas as pd
 from webapp.utils.enrich_sunspots import get_enriched_dataframe
 from webapp.utils.trends_util import moving_average, rolling_mean, min_index,\
     exponential_smoothing, double_exponential_smoothing, find_minimums, \
-    get_optimal_params
+    get_optimal_params, hw_exponential_smoothing
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -97,3 +97,14 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertTrue(alpha > 0., "alpha > 0")
         self.assertTrue(beta >= 0., "beta >= 0")
         self.assertTrue(gamma > 0., "gamma > 0.")
+
+    def test_hw_exponential_smoothing(self):
+        """ юнит-тест для triple exponential smoothing """
+        data = get_enriched_dataframe()
+        size = len(data["sunspots"].values)
+
+        result = hw_exponential_smoothing(data.sunspots)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result), size, f"minimums равен {size}")
+        self.assertTrue(result[-1] > 0, " > 0")
