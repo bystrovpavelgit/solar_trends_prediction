@@ -3,15 +3,14 @@ from flask import Blueprint, render_template
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
-    double_exponential_smoothing, triple_exponential_smoothing_, \
-    get_fourier_amplitudes
+    double_exponential_smoothing, triple_exponential_smoothing_
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
 
 @blueprint.route("/rolling_means")
 def rolling_means():
-    """ rolling means """
+    """ display rolling means """
     data = get_enriched_dataframe()
     info = {'graph': 'Moving average for sunspots numbers'}
     time = data["year_float"].values.tolist()
@@ -29,7 +28,7 @@ def rolling_means():
 
 @blueprint.route("/exp_smoothing")
 def exp_smoothing():
-    """ exponential smoothing """
+    """ display exponential smoothing """
     data = get_enriched_dataframe()
     time = data["year_float"].values.tolist()
     period = 1200  # show 100 years
@@ -45,7 +44,7 @@ def exp_smoothing():
 
 @blueprint.route("/holt_winters")
 def holt_winters():
-    """ Holt-winters exponential smoothing """
+    """ display Holt-winters exponential smoothing """
     data = get_enriched_dataframe()
     time = data["year_float"].values.tolist()
     sunspots = data["sunspots"].values.tolist()
@@ -56,21 +55,9 @@ def holt_winters():
                            y2=triple)
 
 
-@blueprint.route("/fourier")
-def fourier():
-    """ Holt-winters exponential smoothing """
-    data = get_enriched_dataframe()
-    periodical = data["sunspots"].values[885:-28]
-    print("total", len(periodical))
-    amplitudes = get_fourier_amplitudes(periodical, remove_trend=True)
-    return render_template("stat/fft.html",
-                           time=list(range(len(periodical))),
-                           y=amplitudes.tolist())
-
-
 @blueprint.route("/best")
 def best_model():
-    """ function to find best ML model """
+    """ display results for best ML model """
     info = {'graph': 'Adaboost classifier predictions for max and min'}
     time, pmax, pmin, max_, sunspots = get_results_for_best_classifier()
     period = len(time)
