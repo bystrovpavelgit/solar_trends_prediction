@@ -3,7 +3,8 @@ from flask import Blueprint, render_template
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
-    double_exponential_smoothing, hw_exponential_smoothing
+    double_exponential_smoothing, hw_exponential_smoothing, \
+    get_fourier_prediction
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
@@ -69,3 +70,17 @@ def best_model():
                            y2=(pmin[:period] * 50).tolist(),
                            y3=max_[:period].tolist(),
                            y4=sunspots[:period].tolist())
+
+
+@blueprint.route("/fourier")
+def fourier():
+    """ display fourier method predictions """
+    data = get_enriched_dataframe()
+    time = data["year_float"].values
+    sunspots = data["sunspots"].values
+    preds, time2 = get_fourier_prediction(sunspots, time, 300)
+    return render_template("stat/fourier.html",
+                           time=time.tolist(),
+                           y=sunspots.tolist(),
+                           time2=time2.tolist(),
+                           y2=preds.tolist())

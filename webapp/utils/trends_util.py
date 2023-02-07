@@ -265,14 +265,26 @@ def hw_exponential_smoothing(data: Series, sess_len: int = 128) -> list:
     return predictions
 
 
-def get_fourier_amplitudes(x_data, remove_trend=False):
+def get_fourier_prediction(x_data: array, ts: array,
+                           n_predict: int, n_harm: int = 120) -> tuple:
     """ calculate fourier amplitudes using numpy.fft """
     num = x_data.size
-    if remove_trend:
-        trend = np.arange(0, num)
-        coeff = np.polyfit(trend, x_data, 1)
-        no_trend = x_data - coeff[0] * trend
-    else:
-        no_trend = x_data
-    freq_distribution = fft.fft(no_trend)
-    return np.absolute(freq_distribution) / num
+    time = np.arange(0, num)
+    p = np.polyfit(time, x_data, 1)
+    x_notrend = x_data - p[0] * time
+    x_freqdom = fft.fft(x_notrend)
+    freq = fft.fftfreq(num)
+    indexes = list(range(num))
+    # sort indexes by frequency, lower -> higher
+    indexes.sort(key=lambda inp: np.absolute(freq[inp]))
+    time = np.arange(0, num + n_predict)
+    restored_sig = np.zeros(time.size)
+    for i in indexes[:1 + n_harm * 2]:
+        amplitude = np.absolute(x_freqdom[i]) / num
+        phase = np.angle(x_freqdom[i])
+        restored_sig +=\
+            amplitude * np.cos(2 * np.pi * freq[i] * time + phase)
+    res = restored_sig + p[0] * time
+    res_ts = ts[-n_predict:] + (n_predict / 12)
+    tuple_ = (res[-n_predict:], res_ts)
+    return tuple_
