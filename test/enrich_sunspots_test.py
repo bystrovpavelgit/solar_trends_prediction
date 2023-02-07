@@ -60,7 +60,10 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertEqual(len(filled), 0, "empty")
 
     def test_get_enriched_dataframe(self):
-        """ test get_enriched_dataframe function csv_file="data/sunspot_numbers.csv" """
+        """
+            test get_enriched_dataframe function using
+            csv_file="data/sunspot_numbers.csv"
+        """
         csv = "data/sunspot_numbers.csv"
 
         data = get_enriched_dataframe(csv_file=csv)
@@ -79,7 +82,9 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertTrue("y_max" in data.columns)
 
     def test_get_enriched_dataframe_negatively(self):
-        """ test get_enriched_dataframe function csv_file="data/sunspot_numbers.csv" """
+        """ test get_enriched_dataframe function
+            csv_file="data/sunspot_numbers.csv"
+        """
         csv = "none.csv"
 
         try:

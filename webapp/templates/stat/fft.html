@@ -1,0 +1,18 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Define Data
+var data = [
+  {x: {{ time }} , y: {{ y }} , mode: 'lines+markers', name: 'Amplitudes'},
+];
+
+var layout = {title: "fourier amplitudes distribution for sunspots numbers graph", xaxis: {title: "n", showgrid: true}, yaxis: {title: 'amplitude'}};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+
+{% endblock %}

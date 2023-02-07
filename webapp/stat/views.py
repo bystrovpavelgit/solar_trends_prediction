@@ -3,7 +3,8 @@ from flask import Blueprint, render_template
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
-    double_exponential_smoothing, triple_exponential_smoothing_
+    double_exponential_smoothing, triple_exponential_smoothing_, \
+    get_fourier_amplitudes
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
@@ -53,6 +54,18 @@ def holt_winters():
                            time=time,
                            y=sunspots,
                            y2=triple)
+
+
+@blueprint.route("/fourier")
+def fourier():
+    """ Holt-winters exponential smoothing """
+    data = get_enriched_dataframe()
+    periodical = data["sunspots"].values[885:-28]
+    print("total", len(periodical))
+    amplitudes = get_fourier_amplitudes(periodical, remove_trend=True)
+    return render_template("stat/fft.html",
+                           time=list(range(len(periodical))),
+                           y=amplitudes.tolist())
 
 
 @blueprint.route("/best")

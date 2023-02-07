@@ -1,7 +1,7 @@
 """ trends modification utility """
 from functools import partial
 import numpy as np
-from numpy import array
+from numpy import array, fft
 from scipy.optimize import minimize
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
@@ -117,7 +117,8 @@ class HoltWinters:
         """ initial trend """
         sum_ = 0.0
         for i in range(self.slen):
-            sum_ += float(self.series[i + self.slen] - self.series[i]) / self.slen
+            sum_ += float(self.series[i + self.slen] - self.series[i]) / \
+                    self.slen
         res = sum_ / self.slen
         return res
 
@@ -164,18 +165,22 @@ class HoltWinters:
                 self.seasons.append(seasonals[i % self.slen])
                 self.predicted_deviation.append(0)
                 self.upper_bond.append(
-                    self.result[0] + self.scaling_factor * self.predicted_deviation[0]
+                    self.result[0] + self.scaling_factor *
+                    self.predicted_deviation[0]
                 )
                 self.lower_bond.append(
-                    self.result[0] - self.scaling_factor * self.predicted_deviation[0]
+                    self.result[0] - self.scaling_factor *
+                    self.predicted_deviation[0]
                 )
                 continue
 
             if i >= len(self.series):
                 num = i - len(self.series) + 1
-                self.result.append((smooth + num * trend) + seasonals[i % self.slen])
+                self.result.append((smooth + num * trend) +
+                                   seasonals[i % self.slen])
                 # when predicting we increase uncertainty on each step
-                self.predicted_deviation.append(self.predicted_deviation[-1] * 1.01)
+                self.predicted_deviation.append(
+                    self.predicted_deviation[-1] * 1.01)
             else:
                 val = self.series[i]
                 last_smooth, smooth = (
@@ -183,7 +188,8 @@ class HoltWinters:
                     self.alpha * (val - seasonals[i % self.slen])
                     + (1 - self.alpha) * (smooth + trend),
                 )
-                trend = self.beta * (smooth - last_smooth) + (1 - self.beta) * trend
+                delta_smooth = smooth - last_smooth
+                trend = self.beta * delta_smooth + (1 - self.beta) * trend
                 seasonals[i % self.slen] = (
                         self.gamma * (val - smooth)
                         + (1 - self.gamma) * seasonals[i % self.slen]
@@ -196,10 +202,12 @@ class HoltWinters:
                 )
 
             self.upper_bond.append(
-                self.result[-1] + self.scaling_factor * self.predicted_deviation[-1]
+                self.result[-1] + self.scaling_factor *
+                self.predicted_deviation[-1]
             )
             self.lower_bond.append(
-                self.result[-1] - self.scaling_factor * self.predicted_deviation[-1]
+                self.result[-1] - self.scaling_factor *
+                self.predicted_deviation[-1]
             )
             self.Smooth.append(smooth)
             self.trends.append(trend)
@@ -254,3 +262,16 @@ def triple_exponential_smoothing_(data, sess_len=128):
     model.triple_exponential_smoothing()
     predictions = model.result
     return predictions
+
+
+def get_fourier_amplitudes(x_data, remove_trend=False):
+    """ calculate fourier amplitudes using numpy.fft """
+    num = x_data.size
+    if remove_trend:
+        trend = np.arange(0, num)
+        coeff = np.polyfit(trend, x_data, 1)
+        no_trend = x_data - coeff[0] * trend
+    else:
+        no_trend = x_data
+    freq_distribution = fft.fft(no_trend)
+    return np.absolute(freq_distribution) / num

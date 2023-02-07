@@ -51,7 +51,7 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     # correction for many zeroes at the end of minimum #5
     cy6 = (mins[5] + mins[6]) // 2
     # drop invalid minimums 6 and 9
-    indices = [0] + mins[:5] + [cy6, mins[7], cy8, mins[8]] + mins[10:] +\
+    indices = [0] + mins[:5] + [cy6, mins[7], cy8, mins[8]] + mins[10:] + \
               [len(trend)]
     # calculate min, max and average number of sunspots for solar cycles
     min_ = fill_values(trend, indices, np.min)
@@ -91,7 +91,8 @@ def predict_using_cross_validation(clf, params, data, dframe):
     pred_min = gcv.predict(x_test2)
     mse2 = mean_squared_error(min_test, pred_min)
     class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
-    print(f"MSE for maximum using {class_name} = {mse1} , MSE for minimum = {mse2}")
+    print(f"MSE for maximum using \
+         {class_name} = {mse1} , MSE for minimum = {mse2}")
     score = (gcv1.best_score_ + gcv.best_score_) * 0.5
     return score, gcv1.best_params_
 
@@ -117,13 +118,16 @@ def get_results_for_best_classifier():
     cols = ["sunspots", "observations", "mean_1y", "mean_3y", "mean_12y",
             "sn_mean", "sn_max", "sn_min"]
     data_scaled = StandardScaler().fit_transform(dframe[cols].values)
-    params_lr = {'C': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
-    params_rid = {'alpha': np.linspace(8, 200, 20) / 10, 'class_weight': ["balanced", None]}
+    params_lr = {'C': np.linspace(8, 200, 20) / 10,
+                 'class_weight': ["balanced", None]}
+    params_rid = {'alpha': np.linspace(8, 200, 20) / 10,
+                  'class_weight': ["balanced", None]}
     params = {"n_estimators": [3, 4, 5, 7], "max_depth": [3, 4, 5, 6, 9]}
     estimators = {"n_estimators": [4, 5, 7, 10, 12]}
     params_dt = {"max_depth": [3, 4, 5, 6, 9]}
     params_knn = {"n_neighbors": [4, 5, 7, 8, 10, 12]}
-    params_ada = {"n_estimators": [3, 4, 5, 7], "learning_rate": [0.2, 1., 9.9]}
+    params_ada = {"n_estimators": [3, 4, 5, 7],
+                  "learning_rate": [0.2, 1., 9.9]}
     classifiers = [
         (AdaBoostClassifier(), params_ada),
         (LogisticRegression(), params_lr),
@@ -138,10 +142,15 @@ def get_results_for_best_classifier():
     max_score = 0.
     results = (ExtraTreesClassifier(), {})
     for clf, parameters in classifiers:
-        score, best_params = predict_using_cross_validation(clf, parameters, data_scaled, dframe)
+        score, best_params = predict_using_cross_validation(clf,
+                                                            parameters,
+                                                            data_scaled,
+                                                            dframe)
         if max_score < score:
             max_score = score
             results = (clf, best_params)
     print(f"best model {str(results[0].__class__)} {results[1]}")
-    predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0], data_scaled, dframe)
+    predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0],
+                                                                   data_scaled,
+                                                                   dframe)
     return times, predict_max, predict_min, max_, sunspots
