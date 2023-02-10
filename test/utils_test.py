@@ -3,7 +3,7 @@ import pandas as pd
 import unittest
 from webapp import create_app
 from webapp.business_logic import get_user_by_name
-from webapp.dl_logic import create_line_plot
+from webapp.dl_logic import sunspot_numbers
 
 
 class TestUser(unittest.TestCase):
@@ -31,10 +31,10 @@ class TestUser(unittest.TestCase):
         year = data['year_float'].values.tolist()
         spots = data['sunspots'].values.tolist()
 
-        dat1, dat2 = create_line_plot()
-        dat1, dat2 = list(dat1), list(dat2)
+        res1, res2 = sunspot_numbers()
+        res1, res2 = list(res1), list(res2)
 
-        self.assertIsNotNone(dat1, "year not None")
-        self.assertIsNotNone(dat2, "sunspots not None")
-        self.assertEqual(dat1, year, "user.username == gav")
-        self.assertEqual(dat2, spots, "user.username == gav")
+        self.assertIsNotNone(res1, "year not None")
+        self.assertIsNotNone(res2, "sunspots not None")
+        self.assertEqual(res1, year, "res1 == years")
+        self.assertEqual(res2, spots, "res2 == spots")

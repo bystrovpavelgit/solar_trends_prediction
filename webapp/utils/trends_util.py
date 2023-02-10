@@ -30,14 +30,6 @@ def find_minimums(series: array, length: int) -> list:
     return result
 
 
-def moving_average(series, num):
-    """
-        Calculate average of last n observations
-    """
-    avg = np.average(series[-num:])
-    return avg
-
-
 def rolling_mean(series, num):
     """
         Calculate average of last n observations
@@ -282,7 +274,7 @@ def get_fourier_prediction(x_data: array, ts: array,
     for i in indexes[:1 + n_harm * 2]:
         amplitude = np.absolute(x_freqdom[i]) / num
         phase = np.angle(x_freqdom[i])
-        restored_sig +=\
+        restored_sig += \
             amplitude * np.cos(2 * np.pi * freq[i] * time + phase)
     res = restored_sig + p[0] * time
     res_ts = ts[-n_predict:] + (n_predict / 12)

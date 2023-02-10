@@ -3,24 +3,13 @@ import unittest
 import numpy as np
 import pandas as pd
 from webapp.utils.enrich_sunspots import get_enriched_dataframe
-from webapp.utils.trends_util import moving_average, rolling_mean, min_index,\
-    exponential_smoothing, double_exponential_smoothing, find_minimums, \
+from webapp.utils.trends_util import rolling_mean, min_index, find_minimums, \
+    exponential_smoothing, double_exponential_smoothing, \
     get_optimal_params, hw_exponential_smoothing
 
 
 class TrendsUtilTest(unittest.TestCase):
     """ Trends Util test """
-    def setUp(self):
-        """ Инит TestUser """
-        self.max_len = 5
-
-    def test_moving_average(self):
-        """ moving_average юнит-тест """
-        data = [4, 6, 4, 6, 4, 6]
-
-        avg = moving_average(data, 6)
-
-        self.assertEqual(avg, 5, "равен 5")
 
     def test_sum(self):
         """ summation юнит-тест """
@@ -108,3 +97,11 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(len(result), size, f"minimums равен {size}")
         self.assertTrue(result[-1] > 0, " > 0")
+
+    def test_get_operator(self):
+        """ test list get operator """
+        result = ["A"]
+
+        value = result[-1]
+
+        self.assertEqual(value, "A")

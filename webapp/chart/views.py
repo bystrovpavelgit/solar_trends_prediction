@@ -1,7 +1,7 @@
 """ chart views """
 from flask import Blueprint, render_template
 from numpy import hstack
-from webapp.dl_logic import create_line_plot, predict_next_cycle, \
+from webapp.dl_logic import sunspot_numbers, predict_next_cycle, \
     predict_two_cycles
 
 
@@ -11,7 +11,7 @@ blueprint = Blueprint("chart", __name__, url_prefix="/chart")
 @blueprint.route("/chart")
 def draw():
     """ draw function """
-    dat1, dat2 = create_line_plot()
+    dat1, dat2 = sunspot_numbers()
     return render_template("chart/chart.html",
                            x=dat1.tolist(),
                            y=dat2.tolist())
@@ -20,7 +20,7 @@ def draw():
 @blueprint.route("/bar_plot")
 def bar_plot():
     """ bar_plot function """
-    dat1, dat2 = create_line_plot()
+    dat1, dat2 = sunspot_numbers()
     return render_template("chart/barplot.html",
                            time=dat1[-200:].tolist(),
                            y=dat2[-200:].tolist())
@@ -29,7 +29,7 @@ def bar_plot():
 @blueprint.route("/next_cycle")
 def draw_next_cycle():
     """ draw next cycle """
-    years, spots = create_line_plot()
+    years, spots = sunspot_numbers()
     data, times = predict_next_cycle(spots[-1152:], years[-1152:])
     dat = hstack([spots[-1152:], data])
     time = hstack((years[-1152:], times))
@@ -43,7 +43,7 @@ def draw_next_cycle():
 @blueprint.route("/two_cycles")
 def draw_next_two_cycles():
     """ draw next two cycles """
-    years, spots = create_line_plot()
+    years, spots = sunspot_numbers()
     data, times = predict_two_cycles(spots[-1152:], years[-1152:])
     return render_template("chart/predict_cycles.html",
                            x=times[-256:].tolist(),
