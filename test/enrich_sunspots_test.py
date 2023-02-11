@@ -92,7 +92,7 @@ class EnrichSunspotsTest(unittest.TestCase):
         except FileNotFoundError as err:
             self.assertEqual(err.strerror, "No such file or directory")
 
-    def test_predict_cv_and_plot_results1(self):
+    def test_predict_using_cross_validation1(self):
         """ test_predict_cv_and_plot_results """
         clsf = RandomForestClassifier()
         scaled = self.data_scaled
@@ -106,7 +106,7 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertTrue(best_params['max_depth'] >= 4)
         self.assertTrue(best_params['n_estimators'] >= 3)
 
-    def test_predict_cv_and_plot_results2(self):
+    def test_predict_using_cross_validation2(self):
         """ test_predict_cv_and_plot_results """
         clsf = XGBClassifier(random_state=17)
         scaled = self.data_scaled

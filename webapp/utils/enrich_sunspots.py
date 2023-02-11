@@ -73,7 +73,9 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
 
 
 def predict_using_cross_validation(clf, params, data, dframe):
-    """ predict cv and plot results """
+    """ predict with classifier using cross-validation with n=3"""
+    if clf is None or data is None or dframe is None:
+        raise ValueError("Empty parameters")
     y_max = dframe["y_max"].values
     y_min = dframe["y_min"].values
     x_train1, x_test1, max_train, max_test = \
@@ -97,8 +99,12 @@ def predict_using_cross_validation(clf, params, data, dframe):
     return score, gcv1.best_params_
 
 
-def evaluate_classifier(clf, data_scaled, dframe):
+def evaluate_classifier(clf, best_params, data_scaled, dframe):
     """ evaluate classifier """
+    if clf is None or best_params is None or dframe is None or\
+            data_scaled is None:
+        raise ValueError("Empty parameters")
+    clf.set_params(best_params)
     y_max = dframe["y_max"].values
     y_min = dframe["y_min"].values
     max_ = dframe["sn_max"].values
@@ -142,15 +148,19 @@ def get_results_for_best_classifier():
     max_score = 0.
     results = (ExtraTreesClassifier(), {})
     for clf, parameters in classifiers:
-        score, best_params = predict_using_cross_validation(clf,
-                                                            parameters,
-                                                            data_scaled,
-                                                            dframe)
-        if max_score < score:
-            max_score = score
-            results = (clf, best_params)
+        try:
+            score, best_params = predict_using_cross_validation(clf,
+                                                                parameters,
+                                                                data_scaled,
+                                                                dframe)
+            if max_score < score:
+                max_score = score
+                results = (clf, best_params)
+        except ValueError:
+            print("Wrong parameters for predict_using_cross_validation")
     print(f"best model {str(results[0].__class__)} {results[1]}")
     predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0],
+                                                                   results[1],
                                                                    data_scaled,
                                                                    dframe)
     return times, predict_max, predict_min, max_, sunspots
