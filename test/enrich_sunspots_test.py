@@ -1,11 +1,11 @@
 """ enrich sunspots tests """
 import unittest
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 from webapp.utils.enrich_sunspots import fill_values, \
-    get_enriched_dataframe, predict_using_cross_validation
+    get_enriched_dataframe, predict_using_cross_validation, evaluate_classifier
 
 
 class EnrichSunspotsTest(unittest.TestCase):
@@ -119,3 +119,19 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertTrue(score > 0.91)
         self.assertTrue(best_params['max_depth'] >= 3)
         self.assertTrue(best_params['n_estimators'] >= 3)
+
+    def test_evaluate_classifier(self):
+        """ test evaluate_classifier function"""
+        params = {"n_estimators": 4, "max_depth": 3}
+        clsf = ExtraTreesClassifier()
+
+        predict_max, predict_min, max_, sunspots = \
+            evaluate_classifier(clsf,
+                                params,
+                                self.data_scaled,
+                                self.dframe)
+
+        self.assertIsNotNone(predict_max)
+        self.assertIsNotNone(predict_min)
+        self.assertIsNotNone(max_)
+        self.assertIsNotNone(sunspots)

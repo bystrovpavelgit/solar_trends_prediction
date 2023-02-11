@@ -99,12 +99,11 @@ def predict_using_cross_validation(clf, params, data, dframe):
     return score, gcv1.best_params_
 
 
-def evaluate_classifier(clf, best_params, data_scaled, dframe):
+def evaluate_classifier(clf, params, data_scaled, dframe):
     """ evaluate classifier """
-    if clf is None or best_params is None or dframe is None or\
-            data_scaled is None:
+    if clf is None or dframe is None or data_scaled is None:
         raise ValueError("Empty parameters")
-    clf.set_params(best_params)
+    clf.set_params(**params)
     y_max = dframe["y_max"].values
     y_min = dframe["y_min"].values
     max_ = dframe["sn_max"].values
