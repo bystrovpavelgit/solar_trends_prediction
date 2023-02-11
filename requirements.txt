@@ -7,6 +7,7 @@ Werkzeug
 WTForms
 flask_login
 flask_sqlalchemy
+sqlalchemy
 pandas
 scipy
 sklearn

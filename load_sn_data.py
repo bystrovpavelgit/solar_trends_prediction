@@ -1,5 +1,7 @@
-""" Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
-    load sunspots data utility """
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    sunspots data loader for database
+"""
 import csv
 from sqlite3 import IntegrityError
 from sqlalchemy.exc import SQLAlchemyError, PendingRollbackError
@@ -48,7 +50,7 @@ def insert_sunspots(data):
             DB.session.rollback()
 
 
-def process_from_file(name="data/sunspot_numbers_enriched.csv"):
+def process_data_from_file(name="data/sunspot_numbers_enriched.csv"):
     """ process authors from file """
     columns = ["Year",
                "month",
@@ -76,8 +78,8 @@ def process_from_file(name="data/sunspot_numbers_enriched.csv"):
 
 if __name__ == "__main__":
     app = create_app()
-    df = get_enriched_dataframe(csf_file="data/sunspot_numbers.csv")
+    df = get_enriched_dataframe()
     df.to_csv("data/sunspot_numbers_enriched.csv", sep=";", index=False)
     with app.app_context():
-        res = process_from_file(name="data/sunspot_numbers_enriched.csv")
+        res = process_data_from_file(name="data/sunspot_numbers_enriched.csv")
         print(f"{len(res)} sunspot numbers loaded")
