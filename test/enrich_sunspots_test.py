@@ -135,3 +135,29 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertIsNotNone(predict_min)
         self.assertIsNotNone(max_)
         self.assertIsNotNone(sunspots)
+
+    def test_evaluate_classifier_negatively1(self):
+        """ negatively test evaluate_classifier function"""
+        params = {"n_estimators": 4, "max_depth": 3}
+        clsf = None
+        try:
+            res = \
+                evaluate_classifier(clsf,
+                                    params,
+                                    self.data_scaled,
+                                    self.dframe)
+        except ValueError as err:
+            self.assertIsNotNone(err)
+
+    def test_evaluate_classifier_negatively2(self):
+        """ negatively test evaluate_classifier function"""
+        params = None
+        clsf = ExtraTreesClassifier()
+        try:
+            res = \
+                evaluate_classifier(clsf,
+                                    params,
+                                    self.data_scaled,
+                                    self.dframe)
+        except ValueError as err:
+            self.assertIsNotNone(err)
