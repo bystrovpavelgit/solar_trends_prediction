@@ -146,6 +146,7 @@ class EnrichSunspotsTest(unittest.TestCase):
                                     params,
                                     self.data_scaled,
                                     self.dframe)
+            self.assertIsNotNone(res)
         except ValueError as err:
             self.assertIsNotNone(err)
 
@@ -159,5 +160,6 @@ class EnrichSunspotsTest(unittest.TestCase):
                                     params,
                                     self.data_scaled,
                                     self.dframe)
+            self.assertIsNotNone(res)
         except ValueError as err:
             self.assertIsNotNone(err)
