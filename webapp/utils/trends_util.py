@@ -23,6 +23,8 @@ def min_index(series: array, start: int, interval: int) -> int:
 
 def find_minimums(series: array, length: int) -> list:
     """ find all minimums in series """
+    if length <= 0:
+        return []
     k = len(series) // length
     if len(series) > k * length:
         k += 1
@@ -30,7 +32,7 @@ def find_minimums(series: array, length: int) -> list:
     return result
 
 
-def rolling_mean(series, num):
+def rolling_mean(series: Series, num: int) -> Series:
     """
         Calculate average of last n observations
     """
@@ -208,7 +210,7 @@ class HoltWinters:
 
 
 def timeseries_cv_score(values, params):
-    """ timeseries CV score """
+    """ timeseries cross-validation score """
     errors = []
     tscv = TimeSeriesSplit(n_splits=3)
     # строим прогноз на отложенной выборке и считаем ошибку
@@ -233,6 +235,8 @@ def timeseries_cv_score(values, params):
 def get_optimal_params(data):
     """ get optimal params """
     args = np.array([0, 0, 0])
+    if len(data) == 0:
+        return args.tolist()
     timeseries_cv_func = partial(timeseries_cv_score, data.values)
     # минимизируем L
     opt = minimize(timeseries_cv_func, x0=args, method="TNC",

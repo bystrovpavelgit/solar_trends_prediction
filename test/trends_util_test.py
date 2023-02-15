@@ -61,21 +61,37 @@ class TrendsUtilTest(unittest.TestCase):
 
         self.assertEqual(index, -1, "min_index равен -1")
 
-    def test_find_minimums_negatively(self):
-        """ негативный юнит-тест для min_index """
+    def test_find_minimums_positively(self):
+        """ негативный юнит-тест для find_minimums """
+        inp = np.array([2, 3, 5, 5, 3, 1, 2])
+
+        arr = find_minimums(inp, 7)
+
+        self.assertEqual(arr, [5], "minimums равен [5]")
+
+    def test_find_minimums_negatively1(self):
+        """ негативный юнит-тест для find_minimums """
         empty = np.array([])
 
         arr = find_minimums(empty, 9)
 
         self.assertEqual(arr, [], "minimums = []")
 
-    def test_find_minimums_positively(self):
-        """ негативный юнит-тест для min_index """
-        inp = np.array([2, 3, 5, 5, 3, 1, 2])
+    def test_find_minimums_negatively2(self):
+        """ негативный юнит-тест для find_minimums """
+        empty = np.array([2, 3, 5])
 
-        arr = find_minimums(inp, 7)
+        arr = find_minimums(empty, -1)
 
-        self.assertEqual(arr, [5], "minimums равен [5]")
+        self.assertEqual(arr, [], "minimums = []")
+
+    def test_find_minimums_negatively3(self):
+        """ негативный юнит-тест для find_minimums """
+        empty = np.array([2, 3, 5])
+
+        arr = find_minimums(empty, 0)
+
+        self.assertEqual(arr, [], "minimums = []")
 
     def test_get_optimal_params(self):
         """ юнит-тест для get_optimal_params func """
@@ -86,6 +102,16 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertTrue(alpha > 0., "alpha > 0")
         self.assertTrue(beta >= 0., "beta >= 0")
         self.assertTrue(gamma > 0., "gamma > 0.")
+
+    def test_get_optimal_params_negatively1(self):
+        """ негативный юнит-тест для get_optimal_params func """
+        dataset = np.array([])
+
+        alpha, beta, gamma = get_optimal_params(dataset)
+
+        self.assertEqual(alpha, 0, "alpha == 0")
+        self.assertEqual(beta, 0, "beta == 0")
+        self.assertEqual(gamma, 0, "gamma == 0")
 
     def test_hw_exponential_smoothing(self):
         """ юнит-тест для triple exponential smoothing """
