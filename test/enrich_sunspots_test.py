@@ -5,7 +5,8 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 from webapp.utils.enrich_sunspots import fill_values, \
-    get_enriched_dataframe, predict_using_cross_validation, evaluate_classifier
+    get_enriched_dataframe, predict_using_cross_validation, \
+    evaluate_classifier, get_results_for_best_classifier
 
 
 class EnrichSunspotsTest(unittest.TestCase):
@@ -163,3 +164,14 @@ class EnrichSunspotsTest(unittest.TestCase):
             self.assertIsNotNone(res)
         except ValueError as err:
             self.assertIsNotNone(err)
+
+    def test_get_results_for_best_classifier(self):
+        """ test get_results_for_best_classifier """
+        results = get_results_for_best_classifier()
+
+        self.assertIsNotNone(results)
+        self.assertEqual(len(results), 5)
+        self.assertEqual(len(results[0]), len(results[1]))
+        self.assertEqual(len(results[0]), len(results[2]))
+        self.assertEqual(len(results[0]), len(results[3]))
+        self.assertEqual(len(results[0]), len(results[4]))

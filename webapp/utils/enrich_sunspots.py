@@ -101,7 +101,7 @@ def predict_using_cross_validation(clf, params, data, dframe):
 
 def evaluate_classifier(clf, params, data_scaled, dframe):
     """ evaluate classifier """
-    if clf is None or dframe is None or data_scaled is None:
+    if clf is None or dframe is None or params is None or dframe is None:
         raise ValueError("Empty parameters")
     clf.set_params(**params)
     y_max = dframe["y_max"].values
