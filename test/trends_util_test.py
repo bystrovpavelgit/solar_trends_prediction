@@ -103,6 +103,18 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertTrue(beta >= 0., "beta >= 0")
         self.assertTrue(gamma > 0., "gamma > 0.")
 
+    def test_get_optimal_params2(self):
+        """ юнит-тест для get_optimal_params func """
+        dataset = get_enriched_dataframe()
+
+        sunspots = pd.Series(data=dataset.sunspots.values[:1200].tolist())
+        alpha, beta, gamma = get_optimal_params(sunspots)
+        print("alpha, beta, gamma", alpha, beta, gamma)
+
+        self.assertTrue(alpha > 0., "alpha > 0")
+        self.assertTrue(beta >= 0., "beta >= 0")
+        self.assertTrue(gamma > 0., "gamma > 0.")
+
     def test_get_optimal_params_negatively1(self):
         """ негативный юнит-тест для get_optimal_params func """
         dataset = np.array([])

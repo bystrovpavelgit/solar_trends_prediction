@@ -209,7 +209,7 @@ class HoltWinters:
             self.seasons.append(seasonals[i % self.slen])
 
 
-def timeseries_cv_score(values, params):
+def timeseries_cv_score(values, params, cycle=128):
     """ timeseries cross-validation score """
     errors = []
     tscv = TimeSeriesSplit(n_splits=3)
@@ -217,7 +217,7 @@ def timeseries_cv_score(values, params):
     for train, test in tscv.split(values):
         model = HoltWinters(
             series=values[train],
-            season_len=128,
+            season_len=cycle,
             alpha=params[0],
             beta=params[1],
             gamma=params[2],
@@ -233,7 +233,7 @@ def timeseries_cv_score(values, params):
 
 
 def get_optimal_params(data):
-    """ get optimal params """
+    """ укенгшщзвапролд get_optimal_params """
     args = np.array([0, 0, 0])
     if len(data) == 0:
         return args.tolist()
