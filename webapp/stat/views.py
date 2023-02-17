@@ -17,7 +17,7 @@ def log_and_flash(msg: str) -> None:
     flash(msg)
 
 
-def get_data_by_type(smooth_type: str) -> tuple:
+def get_smoothed_data_by_type(smooth_type: str) -> tuple:
     """ get data Series by type """
     data = get_enriched_dataframe()
     time = data["year_float"].values.tolist()
@@ -45,7 +45,7 @@ def process_smoothing():
             log_and_flash(f"неверный тип сглаживания: {type_}")
         else:
             selected = type_
-    result = get_data_by_type(selected)
+    result = get_smoothed_data_by_type(selected)
     return render_template("stat/select_graph.html",
                            title="Выбор сглаживания",
                            selected=selected,
