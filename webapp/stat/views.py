@@ -1,6 +1,6 @@
 """ statistical views """
-from flask import Blueprint, render_template, request, flash
 import logging
+from flask import Blueprint, render_template, request, flash
 from webapp.config import VALID_VALUES
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier

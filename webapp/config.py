@@ -14,5 +14,5 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir,
 SECRET_KEY = "ASDWQYUhj342678gvmjhxckbdvkjbscde"
 REMEMBER_COOKIE_DURATION = timedelta(days=15)
 SQLALCHEMY_TRACK_MODIFICATIONS = True
-VALID_VALUES = ["скользязщее среднее 3г", "скользязщее среднее 12л", "экспоненциальный",
-                "двойной", "тройной"]
+VALID_VALUES = ["скользязщее среднее 3г", "скользязщее среднее 12л",
+                "экспоненциальный", "двойной", "тройной"]

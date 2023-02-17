@@ -10,9 +10,11 @@ from webapp.user.models import User
 
 def get_user_by_name(name):
     """  get user by name """
+    user = None
     try:
         user = User.query.filter_by(username=name).first()
-        return user
     except (SQLAlchemyError, IntegrityError) as ex:
         error = str(ex.__dict__['orig'])
-        logging.error(f"Exception in get_user_by_name: {error} / {name}")
+        msg = f"Exception in get_user_by_name: {error} / {name}"
+        logging.error(msg)
+    return user
