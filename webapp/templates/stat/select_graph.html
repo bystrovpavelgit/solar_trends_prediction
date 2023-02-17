@@ -1,0 +1,51 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+        </div>
+        <div class="col-4">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+				<div class="alert alert-warning" role="alert">
+					{% for message in messages %}
+						{{ message }}<br>
+					{% endfor %}
+				</div>
+				{% endif %}
+			{% endwith %}
+            <form action="{{ url_for('stat.process_smoothing')}}" method="POST">
+                {{ title }}<br>
+                <select class="form-select form-select-lg mb-3" aria-label="select-lg example" name="smoothing">
+                  <option selected>{{ selected }}</option>
+                  <option value="скользязщее среднее 3г">скользязщее среднее 3г</option>
+                  <option value="скользязщее среднее 12л">скользязщее среднее 12л</option>
+                  <option value="экспоненциальный">экспоненциальный</option>
+                  <option value="двойной">двойной</option>
+                  <option value="тройной">тройной</option>
+                </select>
+                <center>
+                <input type="submit" value="OK" name="action_" class="btn btn-primary" />
+                </center>
+            </form>
+        </div>
+        <div class="col-4">
+        </div>
+    </div>
+</div>
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Define Data
+var data = [
+  {x: {{ time }} , y: {{ y }} , mode: 'lines', name: 'Number of sunspots'},
+  {x: {{ time }} , y: {{ y2 }} , mode: 'lines', name: 'Smoothed curve'},
+];
+
+var layout = {title: "Graph of the exponential smoothing for the sunspots numbers curve", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+{% endblock %}

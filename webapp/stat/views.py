@@ -1,5 +1,7 @@
 """ statistical views """
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, flash
+import logging
+from webapp.config import VALID_VALUES
 from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
     get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
@@ -7,6 +9,49 @@ from webapp.utils.trends_util import exponential_smoothing, \
     get_fourier_prediction
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
+
+
+def log_and_flash(msg: str) -> None:
+    """ logging """
+    logging.warning(msg)
+    flash(msg)
+
+
+def get_data_by_type(smooth_type: str) -> tuple:
+    """ get data Series by type """
+    data = get_enriched_dataframe()
+    time = data["year_float"].values.tolist()
+    sunspots = data["sunspots"].values.tolist()
+    if smooth_type == VALID_VALUES[1]:
+        smoothed = data["mean_12y"].values.tolist()
+    elif smooth_type == VALID_VALUES[2]:
+        smoothed = exponential_smoothing(data["sunspots"], .25)
+    elif smooth_type == VALID_VALUES[3]:
+        smoothed = double_exponential_smoothing(data["sunspots"], .2, .2)
+    elif smooth_type == VALID_VALUES[4]:
+        smoothed = hw_exponential_smoothing(data.sunspots)
+    else:
+        smoothed = data["mean_3y"].values.tolist()
+    return time, sunspots, smoothed
+
+
+@blueprint.route("/smoothing_curve", methods=["GET", "POST"])
+def process_smoothing():
+    """ show smoothed curve according to type """
+    selected = VALID_VALUES[0]
+    if request.method == "POST":
+        type_ = request.form.get("smoothing")
+        if type_ not in VALID_VALUES:
+            log_and_flash(f"неверный тип сглаживания: {type_}")
+        else:
+            selected = type_
+    result = get_data_by_type(selected)
+    return render_template("stat/select_graph.html",
+                           title="Выбор сглаживания",
+                           selected=selected,
+                           time=result[0],
+                           y=result[1],
+                           y2=result[2])
 
 
 @blueprint.route("/rolling_means")
