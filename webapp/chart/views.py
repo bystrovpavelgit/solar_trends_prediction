@@ -3,7 +3,7 @@ from flask import Blueprint, render_template
 from numpy import hstack
 from webapp.dl_logic import sunspot_numbers, predict_next_cycle, \
     predict_two_cycles
-
+from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
 
 blueprint = Blueprint("chart", __name__, url_prefix="/chart")
 
@@ -30,9 +30,10 @@ def bar_plot():
 def draw_next_cycle():
     """ draw next cycle """
     years, spots = sunspot_numbers()
-    data, times = predict_next_cycle(spots[-1152:], years[-1152:])
-    dat = hstack([spots[-1152:], data])
-    time = hstack((years[-1152:], times))
+    data, times = predict_next_cycle(spots[-RNN_INPUT_SIZE:],
+                                     years[-RNN_INPUT_SIZE:])
+    dat = hstack([spots[-RNN_INPUT_SIZE:], data])
+    time = hstack((years[-RNN_INPUT_SIZE:], times))
     return render_template("chart/two_charts.html",
                            x=time.tolist(),
                            y=dat.tolist(),
@@ -43,10 +44,12 @@ def draw_next_cycle():
 @blueprint.route("/two_cycles")
 def draw_next_two_cycles():
     """ draw next two cycles """
+    double_size = 2 * RNN_OUTPUT_SIZE
     years, spots = sunspot_numbers()
-    data, times = predict_two_cycles(spots[-1152:], years[-1152:])
+    data, times = predict_two_cycles(spots[-RNN_INPUT_SIZE:],
+                                     years[-RNN_INPUT_SIZE:])
     return render_template("chart/predict_cycles.html",
-                           x=times[-256:].tolist(),
+                           x=times[-double_size:].tolist(),
                            y=data.tolist(),
-                           x2=times[:128].tolist(),
-                           y2=data[:128].tolist())
+                           x2=times[:RNN_OUTPUT_SIZE].tolist(),
+                           y2=data[:RNN_OUTPUT_SIZE].tolist())

@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from numpy import hstack
 from tensorflow import keras
+from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
 
 
 def load_rnn_model(file_name="models/sn_2lvl_rnn.h5"):
@@ -15,7 +16,7 @@ def load_rnn_model(file_name="models/sn_2lvl_rnn.h5"):
     model = None
     try:
         model = keras.models.load_model(file_name)
-    except FileNotFoundError:
+    except IOError:
         msg = f"No such file or directory {file_name}"
         logging.error(msg)
     return model
@@ -34,16 +35,20 @@ def sunspot_numbers():
 
 def predict_next_cycle(data, timeseries):
     """ predict next solar cycle """
-    dat2 = data.reshape(-1, 1, 1152)
-    val_predict2 = (np.asarray(SUNSPOTS_MODEL.predict(dat2)))
-    result = val_predict2.reshape(128)
-    new_ts = copy(timeseries[-128:])
-    res_ts = new_ts + (128 / 12)
+    if len(data) != RNN_INPUT_SIZE:
+        raise ValueError("Incorrect input size")
+    dat2 = data.reshape(-1, 1, RNN_INPUT_SIZE)
+    predict = (np.asarray(SUNSPOTS_MODEL.predict(dat2)))
+    result = predict.reshape(RNN_OUTPUT_SIZE)
+    new_ts = copy(timeseries[-RNN_OUTPUT_SIZE:])
+    res_ts = new_ts + (RNN_OUTPUT_SIZE / 12)
     return result, res_ts
 
 
 def predict_two_cycles(data, timeseries):
     """ predict next two solar cycles """
+    if len(data) != RNN_INPUT_SIZE:
+        raise ValueError("Incorrect input size")
     result, res_ts = predict_next_cycle(data, timeseries)
     next_data = hstack([data, result])[-data.shape[0]:]
     next_ts = hstack([timeseries, res_ts])[-data.shape[0]:]
