@@ -30,8 +30,10 @@ def get_smoothed_data_by_type(smooth_type: str) -> tuple:
         smoothed = double_exponential_smoothing(data["sunspots"], .2, .2)
     elif smooth_type == VALID_VALUES[4]:
         smoothed = hw_exponential_smoothing(data.sunspots)
-    else:
+    elif smooth_type == VALID_VALUES[0]:
         smoothed = data["mean_3y"].values.tolist()
+    else:
+        return [], [], []
     return time, sunspots, smoothed
 
 
