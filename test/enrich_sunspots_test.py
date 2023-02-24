@@ -6,7 +6,8 @@ from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 from webapp.utils.enrich_sunspots import fill_values, \
     get_enriched_dataframe, predict_using_cross_validation, \
-    evaluate_classifier, get_results_for_best_classifier
+    evaluate_classifier, get_results_for_best_classifier, \
+    get_users_timeseries
 
 
 class EnrichSunspotsTest(unittest.TestCase):
@@ -175,3 +176,12 @@ class EnrichSunspotsTest(unittest.TestCase):
         self.assertEqual(len(results[0]), len(results[2]))
         self.assertEqual(len(results[0]), len(results[3]))
         self.assertEqual(len(results[0]), len(results[4]))
+
+    def test_get_users_timeseries_negatively(self):
+        """ test get_users_timeseries """
+        csv = "data/none.csv"
+
+        data = get_users_timeseries(csv_file=csv)
+
+        self.assertIsNotNone(data)
+        self.assertTrue(data.is_empty())

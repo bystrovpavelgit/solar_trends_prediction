@@ -1,7 +1,9 @@
 """ enrich sunspots utility """
 import pandas as pd
+import logging
 import numpy as np
 from numpy import hstack
+from optional import Optional
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, \
     ExtraTreesClassifier, BaggingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
@@ -27,6 +29,24 @@ def fill_values(data, ndx, func):
     return result
 
 
+def get_users_timeseries(csv_file: str = "data/hour_online.csv") -> Optional:
+    """
+       enrich users timeseries with 12 points moving average,
+       36 points moving averages and 128 points moving average
+    """
+    try:
+        times = pd.read_csv(csv_file)
+        # fill the first value of 34002 instead of NA
+        times["mean_12p"] = rolling_mean(times['Users'], 12).fillna(34002)
+        times["mean_36p"] = rolling_mean(times['Users'], 36).fillna(34002)
+        times["mean_128p"] = rolling_mean(times['Users'], 128).fillna(34002)
+        return Optional.of(times)
+    except FileNotFoundError:
+        message = f"File not found {csv_file}"
+        logging.error(message)
+        return Optional.empty()
+
+
 def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     """
        enrich dataframe with 1y, 3y and 128 months moving averages and
@@ -37,12 +57,10 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     # calculate moving average
     data["mean_1y"] = rolling_mean(data['sunspots'], 12)
     data["mean_3y"] = rolling_mean(data['sunspots'], 36)
-    data["mean_6y"] = rolling_mean(data['sunspots'], 72)
     data["mean_12y"] = rolling_mean(data['sunspots'], 128)
     # fill the first value of 96.7 instead of NA
     data["mean_1y"] = data["mean_1y"].fillna(96.7)
     data["mean_3y"] = data["mean_3y"].fillna(96.7)
-    data["mean_6y"] = data["mean_6y"].fillna(96.7)
     data["mean_12y"] = data["mean_12y"].fillna(96.7)
     # find minimums in trend using period = 128 months
     mins = find_minimums(trend, 128)
