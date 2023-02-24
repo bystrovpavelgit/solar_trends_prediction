@@ -16,31 +16,20 @@
         <a class="nav-link" href="/user/logout">Выход</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/chart/chart">График солнечных пятен</a>
+        <a class="nav-link" href="/chart/chart">График временного ряда</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/chart/bar_plot">Солнечные пятна за 17 лет</a>
+        <a class="nav-link" href="/chart/bar_plot">Временной ряд за 17 лет</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/stat/smoothing_curve">График скользящих средних</a>
       </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="/next_menu" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-            Предсказания пятен
+            Предсказания
           </a>
           <ul class="dropdown-menu">
-              <li class="nav-item">
-                <a class="nav-link" href="/chart/next_cycle">Предсказания на 11 лет</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/chart/two_cycles">Предсказания на 22 года</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/stat/best">Предсказания min и max</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/stat/fourier">Предсказания по методу Фурье</a>
-              </li>
+          {% include "nav_bar_predict.html" %}
           </ul>
         </li>
     </ul>

@@ -34,6 +34,6 @@ def create_app():
 
     @app.route("/next_menu")
     def next_menu():
-        return render_template("additional_menu.html")
+        return render_template("new_menu.html")
 
     return app
