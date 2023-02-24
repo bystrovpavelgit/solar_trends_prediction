@@ -37,10 +37,12 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
     # calculate moving average
     data["mean_1y"] = rolling_mean(data['sunspots'], 12)
     data["mean_3y"] = rolling_mean(data['sunspots'], 36)
+    data["mean_6y"] = rolling_mean(data['sunspots'], 72)
     data["mean_12y"] = rolling_mean(data['sunspots'], 128)
     # fill the first value of 96.7 instead of NA
     data["mean_1y"] = data["mean_1y"].fillna(96.7)
     data["mean_3y"] = data["mean_3y"].fillna(96.7)
+    data["mean_6y"] = data["mean_6y"].fillna(96.7)
     data["mean_12y"] = data["mean_12y"].fillna(96.7)
     # find minimums in trend using period = 128 months
     mins = find_minimums(trend, 128)
@@ -129,7 +131,6 @@ def get_results_for_best_classifier():
                   'class_weight': ["balanced", None]}
     params = {"n_estimators": [3, 4, 5, 7], "max_depth": [3, 4, 5, 6, 9]}
     estimators = {"n_estimators": [4, 5, 7, 10, 12]}
-    params_dt = {"max_depth": [3, 4, 5, 6, 9]}
     params_knn = {"n_neighbors": [4, 5, 7, 8, 10, 12]}
     params_ada = {"n_estimators": [3, 4, 5, 7],
                   "learning_rate": [0.2, 1., 9.9]}
@@ -139,7 +140,6 @@ def get_results_for_best_classifier():
         (RidgeClassifier(), params_rid),
         (GradientBoostingClassifier(), params),
         (BaggingClassifier(DecisionTreeClassifier()), estimators),
-        (DecisionTreeClassifier(), params_dt),
         (RandomForestClassifier(), params),
         (KNeighborsClassifier(), params_knn),
         (ExtraTreesClassifier(), params),
