@@ -1,9 +1,12 @@
-""" statistical views """
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    statistical views
+"""
 import logging
 from flask import Blueprint, render_template, request, flash
 from webapp.config import VALID_VALUES
-from webapp.utils.enrich_sunspots import get_enriched_dataframe, \
-    get_results_for_best_classifier
+from webapp.utils.dataframe_util import get_enriched_dataframe
+from webapp.utils.enrich_sunspots import get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
     double_exponential_smoothing, hw_exponential_smoothing, \
     get_fourier_prediction

@@ -1,29 +1,17 @@
-""" tests for dl_logic """
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    tests for dl_logic
+"""
 import unittest
 import numpy as np
-import pandas as pd
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
+from webapp.utils.dataframe_util import sunspot_numbers
 from webapp.dl_logic import load_rnn_model, predict_next_cycle, \
-    sunspot_numbers, predict_two_cycles
+    predict_two_cycles
 
 
 class DLModelTest(unittest.TestCase):
     """ tests for dl_logic """
-
-    def test_sunspot_numbers(self):
-        """ test sunspot_numbers """
-        data = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
-        year = data['year_float'].values.tolist()
-        spots = data['sunspots'].values.tolist()
-
-        res1, res2 = sunspot_numbers()
-        res1, res2 = list(res1), list(res2)
-
-        self.assertIsNotNone(res1, "year not None")
-        self.assertIsNotNone(res2, "sunspots not None")
-        self.assertEqual(res1, year, "res1 == years")
-        self.assertEqual(res2, spots, "res2 == spots")
-
     def test_load_rnn_model_negatively(self):
         """ unit-test for load_rnn_model_negatively """
         filename = "models/RNN.h5"
@@ -34,7 +22,7 @@ class DLModelTest(unittest.TestCase):
 
     def test_predict_next_cycle(self):
         """ unit-test for predict_next_cycle """
-        years, spots = sunspot_numbers()
+        years, spots = sunspot_numbers().get()
         dummy = np.zeros(RNN_INPUT_SIZE)
 
         data, times = predict_next_cycle(spots[-RNN_INPUT_SIZE:],

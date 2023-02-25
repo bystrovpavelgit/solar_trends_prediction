@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError, PendingRollbackError
 from webapp import create_app
 from webapp.db import DB
 from webapp.user.models import SunspotNumbers
-from webapp.utils.enrich_sunspots import get_enriched_dataframe
+from webapp.utils import dataframe_util
 
 columns_ = ["year_float",
             "sunspots",
@@ -78,7 +78,7 @@ def process_data_from_file(name="data/sunspot_numbers_enriched.csv"):
 
 if __name__ == "__main__":
     app = create_app()
-    df = get_enriched_dataframe()
+    df = dataframe_util.get_enriched_dataframe()
     df.to_csv("data/sunspot_numbers_enriched.csv", sep=";", index=False)
     with app.app_context():
         res = process_data_from_file(name="data/sunspot_numbers_enriched.csv")

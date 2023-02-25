@@ -1,6 +1,10 @@
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    tests for deep learning logic
+"""
 import unittest
 from webapp.stat.views import get_smoothed_data_by_type
-from webapp.utils.enrich_sunspots import get_enriched_dataframe
+from webapp.utils.dataframe_util import get_enriched_dataframe
 
 
 class ViewsTest(unittest.TestCase):

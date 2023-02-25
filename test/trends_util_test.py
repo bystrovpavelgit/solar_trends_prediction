@@ -1,11 +1,13 @@
-""" Trends Util unit-tests """
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    Trends Util unit-tests
+"""
 import unittest
 import numpy as np
 import pandas as pd
-from webapp.utils.enrich_sunspots import get_enriched_dataframe
-from webapp.utils.trends_util import rolling_mean, min_index, find_minimums, \
-    exponential_smoothing, double_exponential_smoothing, \
-    get_optimal_params, hw_exponential_smoothing
+from webapp.utils.dataframe_util import get_enriched_dataframe
+from webapp.utils.trends_util import exponential_smoothing, \
+    double_exponential_smoothing, get_optimal_params, hw_exponential_smoothing
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -14,16 +16,6 @@ class TrendsUtilTest(unittest.TestCase):
     def test_sum(self):
         """ summation юнит-тест """
         self.assertEqual(sum([3, 2]), 5, "равен 5")
-
-    def test_rolling_mean(self):
-        """ rolling_mean юнит-тест """
-        date = pd.Series([0, 4, 6, 4, 6, 4, 6])
-
-        stat = rolling_mean(date, 6).values.tolist()
-
-        self.assertIsNotNone(stat)
-        self.assertEqual(stat[5], 4., "равен 4")
-        self.assertEqual(stat[6], 5., "равен 5")
 
     def test_exponential_smoothing(self):
         """ exponential_smoothing юнит-тест """
@@ -44,54 +36,6 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertIsNotNone(res)
         self.assertEqual(res[1:5], [8.0, 7.0, 7.25, 5.5625],
                          "равен (8.0, 7.0, 7.25, 5.5625)")
-
-    def test_min_index_positively(self):
-        """ позитивный юнит-тест для min_index """
-        arr = np.array([2, 3, 5, 5, 3, 1, 2])
-
-        index = min_index(arr, 0, 6)
-
-        self.assertEqual(index, 5, "min_index = 5")
-
-    def test_min_index_negatively(self):
-        """ негативный юнит-тест для min_index """
-        empty = np.array([])
-
-        index = min_index(empty, 0, 9)
-
-        self.assertEqual(index, -1, "min_index равен -1")
-
-    def test_find_minimums_positively(self):
-        """ негативный юнит-тест для find_minimums """
-        inp = np.array([2, 3, 5, 5, 3, 1, 2])
-
-        arr = find_minimums(inp, 7)
-
-        self.assertEqual(arr, [5], "minimums равен [5]")
-
-    def test_find_minimums_negatively1(self):
-        """ негативный юнит-тест для find_minimums """
-        empty = np.array([])
-
-        arr = find_minimums(empty, 9)
-
-        self.assertEqual(arr, [], "minimums = []")
-
-    def test_find_minimums_negatively2(self):
-        """ негативный юнит-тест для find_minimums """
-        empty = np.array([2, 3, 5])
-
-        arr = find_minimums(empty, -1)
-
-        self.assertEqual(arr, [], "minimums = []")
-
-    def test_find_minimums_negatively3(self):
-        """ негативный юнит-тест для find_minimums """
-        empty = np.array([2, 3, 5])
-
-        arr = find_minimums(empty, 0)
-
-        self.assertEqual(arr, [], "minimums = []")
 
     def test_get_optimal_params(self):
         """ юнит-тест для get_optimal_params func """
@@ -135,11 +79,3 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(len(result), size, f"minimums равен {size}")
         self.assertTrue(result[-1] > 0, " > 0")
-
-    def test_get_operator(self):
-        """ test list get operator """
-        result = ["A"]
-
-        value = result[-1]
-
-        self.assertEqual(value, "A")

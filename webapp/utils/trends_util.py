@@ -1,4 +1,7 @@
-""" trends modification utility """
+"""
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    trends modification utility
+"""
 from functools import partial
 import numpy as np
 from numpy import array, fft
@@ -6,38 +9,6 @@ from pandas import Series
 from scipy.optimize import minimize
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
-
-
-def min_index(series: array, start: int, interval: int) -> int:
-    """ find min index """
-    index = -1
-    if len(series) == 0:
-        return index
-    min_ = np.max(series) + 1.
-    for j in range(start, min(start + interval, len(series))):
-        if series[j] < min_:
-            index = j
-            min_ = series[j]
-    return index
-
-
-def find_minimums(series: array, length: int) -> list:
-    """ find all minimums in series """
-    if length <= 0:
-        return []
-    k = len(series) // length
-    if len(series) > k * length:
-        k += 1
-    result = [min_index(series, i * length, length) for i in range(k)]
-    return result
-
-
-def rolling_mean(series: Series, num: int) -> Series:
-    """
-        Calculate average of last n observations
-    """
-    mean_window_n = series.rolling(window=num).mean()
-    return mean_window_n
 
 
 def exponential_smoothing(series, alpha):
@@ -233,7 +204,7 @@ def timeseries_cv_score(values, params, cycle=128):
 
 
 def get_optimal_params(data):
-    """ укенгшщзвапролд get_optimal_params """
+    """ функция для нахождения оптимальных параметров классификаторов"""
     args = np.array([0, 0, 0])
     if len(data) == 0:
         return args.tolist()

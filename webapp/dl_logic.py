@@ -5,7 +5,6 @@
 import logging
 from copy import copy
 import numpy as np
-import pandas as pd
 from numpy import hstack
 from tensorflow import keras
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
@@ -23,14 +22,6 @@ def load_rnn_model(file_name="models/sn_2lvl_rnn.h5"):
 
 
 SUNSPOTS_MODEL = load_rnn_model(file_name="models/sn_2lvl_rnn.h5")
-
-
-def sunspot_numbers():
-    """ returns sunspot numbers data """
-    data = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
-    year_float = data['year_float'].values
-    sunspots = data['sunspots'].values
-    return year_float, sunspots
 
 
 def predict_next_cycle(data, timeseries):
