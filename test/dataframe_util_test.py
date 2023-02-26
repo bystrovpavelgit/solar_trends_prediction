@@ -5,9 +5,9 @@
 import unittest
 import numpy as np
 import pandas as pd
-from webapp.utils.dataframe_util import fill_values, \
+from webapp.utils.dataframe_util import fill_values, rolling_mean, \
     get_enriched_dataframe, get_users_timeseries, sunspot_numbers, \
-    rolling_mean, find_minimums, min_index
+    find_minimums, min_index
 
 
 class DataframeUtilTest(unittest.TestCase):
@@ -83,15 +83,6 @@ class DataframeUtilTest(unittest.TestCase):
         except FileNotFoundError as err:
             self.assertEqual(err.strerror, "No such file or directory")
 
-    def test_get_users_timeseries_negatively(self):
-        """ test get_users_timeseries """
-        csv = "data/none.csv"
-
-        data = get_users_timeseries(csv_file=csv)
-
-        self.assertIsNotNone(data)
-        self.assertTrue(data.is_empty())
-
     def test_sunspot_numbers(self):
         """ test sunspot_numbers """
         data = pd.read_csv("data/sunspot_numbers.csv", delimiter=";")
@@ -163,3 +154,26 @@ class DataframeUtilTest(unittest.TestCase):
         arr = find_minimums(empty, 0)
 
         self.assertEqual(arr, [], "minimums = []")
+
+    def test_get_users_timeseries_negatively(self):
+        """ test get_users_timeseries """
+        csv = "data/none.csv"
+
+        data = get_users_timeseries(csv_file=csv)
+
+        self.assertIsNotNone(data)
+        self.assertTrue(data.is_empty())
+
+    def test_get_users_timeseries_positively(self):
+        """ test get_users_timeseries """
+        csv = "data/hour_online.csv"
+
+        opt_res = get_users_timeseries(csv_file=csv)
+        data = opt_res.get()
+
+        self.assertIsNotNone(opt_res)
+        self.assertFalse(opt_res.is_empty())
+        self.assertTrue("mean_12p" in data.columns)
+        self.assertTrue("mean_36p" in data.columns)
+        self.assertTrue("mean_128p" in data.columns)
+        self.assertTrue('Users' in data.columns)
