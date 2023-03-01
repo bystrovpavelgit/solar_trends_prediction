@@ -103,7 +103,7 @@ def get_results_for_best_classifier():
                 results = (clf, best_params)
         except ValueError:
             print("Wrong parameters for predict_using_cross_validation")
-    print(f"best model {str(results[0].__class__)} {results[1]}")
+    print(f"best model {str(results[0].__class__)} ")
     predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0],
                                                                    results[1],
                                                                    data_scaled,

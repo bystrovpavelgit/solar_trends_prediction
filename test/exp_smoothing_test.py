@@ -44,12 +44,11 @@ class HoltWintersTest(unittest.TestCase):
             self.assertIsNotNone(result)
             self.assertEqual(result, [2, 2])
 
-# @patch('module.ClassName2')
-# @patch('module.ClassName1')
-# def test(MockClass1, MockClass2):
-#     module.ClassName1()
-#     module.ClassName2()
-#     assert MockClass1 is module.ClassName1
-#     assert MockClass2 is module.ClassName2
-#     assert MockClass1.called
-#     assert MockClass2.called
+    @patch('webapp.utils.trends_util.HoltWinters')
+    def test_Holt_Winters(self, mock_class1):
+        trend = pd.Series([1] * 10)
+        obj = webapp.utils.trends_util.HoltWinters(trend, 8, 0.4, 0.4, 0.4, 1)
+
+        self.assertIsNotNone(obj)
+        self.assertTrue(mock_class1 is webapp.utils.trends_util.HoltWinters)
+        self.assertTrue(mock_class1.called)
