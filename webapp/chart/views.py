@@ -43,7 +43,9 @@ def draw():
 def bar_plot():
     """ bar_plot function """
     dat1, dat2 = load_sunspots_lists()
-    return render_template("chart/barplot.html", time=dat1[-200:], y=dat2[-200:])
+    return render_template("chart/barplot.html",
+                           time=dat1[-200:],
+                           y=dat2[-200:])
 
 
 @blueprint.route("/next_cycle")
