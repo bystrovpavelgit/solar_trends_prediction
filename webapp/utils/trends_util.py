@@ -17,6 +17,10 @@ def exponential_smoothing(series, alpha):
         :attr:`series` - dataset with timeseries
         :attr:`alpha` - float [0.0, 1.0], smoothing parameter for level
     """
+    if alpha < 0:
+        raise ValueError("alpha and beta must be positive")
+    if series is None or len(series) == 0:
+        raise ValueError("Input array must be non empty")
     result = [series[0]]  # first value is same as series
     for num in range(1, len(series)):
         result.append(alpha * series[num] + (1 - alpha) * result[num - 1])
@@ -30,6 +34,10 @@ def double_exponential_smoothing(series, alpha, beta):
         :attr:`alpha` - float [0.0, 1.0], smoothing parameter for level
         :attr:`beta` - float [0.0, 1.0], smoothing parameter for trend
     """
+    if alpha < 0 or beta < 0:
+        raise ValueError("alpha and beta must be positive")
+    if series is None or len(series) == 0:
+        raise ValueError("Input array must be non empty")
     # first value is same as series
     result = [series[0]]
     level, trend = 0, 0
@@ -60,10 +68,11 @@ class HoltWinters:
     :attr:scaling_factor - sets the width of the confidence interval by Brutlag
                 (usually takes values from 2 to 3)
     """
-
     def __init__(self, series, season_len, alpha, beta, gamma, n_preds,
                  scaling_factor=1.96):
         """ init """
+        if n_preds < 0:
+            raise ValueError("n_preds should be positive")
         self.series = series
         self.slen = season_len
         self.alpha = alpha
@@ -109,8 +118,11 @@ class HoltWinters:
             seasonals[i] = sum_of_vals_over_avg / n_seasons
         return seasonals
 
-    def triple_exponential_smoothing(self):
-        """ triple exponential smoothing """
+    def initialize_params(self):
+        """
+           initialize result, Smooth, seasons, trends, predicted_deviation,
+           upper_bond, and lower_bond params
+        """
         self.result = []
         self.Smooth = []
         self.seasons = []
@@ -119,27 +131,31 @@ class HoltWinters:
         self.upper_bond = []
         self.lower_bond = []
 
-        seasonals = self.initial_seasonal_components()
-        smooth, trend = 0, 0
-        for i in range(len(self.series) + self.n_preds):
-            if i == 0:  # components initialization
-                smooth = self.series[0]
-                trend = self.initial_trend()
-                self.result.append(self.series[0])
-                self.Smooth.append(smooth)
-                self.trends.append(trend)
-                self.seasons.append(seasonals[i % self.slen])
-                self.predicted_deviation.append(0)
-                self.upper_bond.append(
-                    self.result[0] + self.scaling_factor *
-                    self.predicted_deviation[0]
-                )
-                self.lower_bond.append(
-                    self.result[0] - self.scaling_factor *
-                    self.predicted_deviation[0]
-                )
-                continue
+    def components_initialization(self, seasonals_):
+        """
+           components initialization of result, Smooth, seasons, trends,
+           predicted_deviation, upper_bond, and lower_bond
+        """
+        trend_ = self.initial_trend()
+        self.predicted_deviation = [0]
+        predict = self.scaling_factor * self.predicted_deviation[0]
+        self.result = [self.series[0]]
+        self.Smooth = [self.series[0]]
+        self.trends = [trend_]
+        self.seasons = [seasonals_[0]]
+        self.upper_bond = [self.result[0] + predict]
+        self.lower_bond = [self.result[0] - predict]
 
+    def triple_exponential_smoothing(self):
+        """ triple exponential smoothing """
+        if len(self.series) + self.n_preds == 0:
+            self.initialize_params()
+            return self.result
+        seasonals = self.initial_seasonal_components()
+        self.components_initialization(seasonals)
+        smooth = self.series[0]
+        trend = self.initial_trend()
+        for i in range(1, len(self.series) + self.n_preds):
             if i >= len(self.series):
                 num = i - len(self.series) + 1
                 self.result.append((smooth + num * trend) +
@@ -166,22 +182,21 @@ class HoltWinters:
                     self.gamma * np.abs(self.series[i] - self.result[i])
                     + (1 - self.gamma) * self.predicted_deviation[-1]
                 )
-
-            self.upper_bond.append(
-                self.result[-1] + self.scaling_factor *
-                self.predicted_deviation[-1]
-            )
-            self.lower_bond.append(
-                self.result[-1] - self.scaling_factor *
-                self.predicted_deviation[-1]
-            )
+            predict = self.scaling_factor * self.predicted_deviation[-1]
+            self.upper_bond.append(self.result[-1] + predict)
+            self.lower_bond.append(self.result[-1] - predict)
             self.Smooth.append(smooth)
             self.trends.append(trend)
             self.seasons.append(seasonals[i % self.slen])
+        return self.result
 
 
 def timeseries_cv_score(values, params, cycle=128):
     """ timeseries cross-validation score """
+    if cycle <= 0:
+        raise ValueError("cycle must be positive")
+    if len(values) == 0 or len(params) == 0:
+        raise ValueError("Input arrays must be non empty")
     errors = []
     tscv = TimeSeriesSplit(n_splits=3)
     # строим прогноз на отложенной выборке и считаем ошибку
@@ -204,9 +219,9 @@ def timeseries_cv_score(values, params, cycle=128):
 
 
 def get_optimal_params(data):
-    """ функция для нахождения оптимальных параметров классификаторов"""
+    """ функция для нахождения оптимальных параметров классификаторов """
     args = np.array([0, 0, 0])
-    if len(data) == 0:
+    if data is None or len(data) == 0:
         return args.tolist()
     timeseries_cv_func = partial(timeseries_cv_score, data.values)
     # минимизируем L
@@ -218,6 +233,10 @@ def get_optimal_params(data):
 
 def hw_exponential_smoothing(data: Series, sess_len: int = 128) -> list:
     """ triple exponential smoothing using Holt-Winters model """
+    if sess_len <= 0:
+        raise ValueError("sess_len must be positive")
+    if data is None or len(data) == 0:
+        raise ValueError("Input array must be non empty")
     opt_params = get_optimal_params(data)
     model = HoltWinters(
         data[:-sess_len],
@@ -227,31 +246,31 @@ def hw_exponential_smoothing(data: Series, sess_len: int = 128) -> list:
         gamma=opt_params[2],
         n_preds=sess_len,
         scaling_factor=2.56)
-    model.triple_exponential_smoothing()
-    predictions = model.result
+    predictions = model.triple_exponential_smoothing()
     return predictions
 
 
-def get_fourier_prediction(x_data: array, ts: array,
+def get_fourier_prediction(x_data: array, times: array,
                            n_predict: int, n_harm: int = 120) -> tuple:
     """ calculate fourier amplitudes using numpy.fft """
-    num = x_data.size
-    time = np.arange(0, num)
-    p = np.polyfit(time, x_data, 1)
-    x_notrend = x_data - p[0] * time
-    x_freqdom = fft.fft(x_notrend)
-    freq = fft.fftfreq(num)
-    indexes = list(range(num))
+    if n_predict <= 0 or n_harm <= 0:
+        raise ValueError("n_predict and n_harm must be positive")
+    if len(x_data) == 0 or len(times) == 0:
+        raise ValueError("Input arrays must be non empty")
+    time = np.arange(0, x_data.size)
+    poly = np.polyfit(time, x_data, 1)
+    x_freqdom = fft.fft(x_data - poly[0] * time)
+    freq = fft.fftfreq(x_data.size)
+    indexes = list(range(x_data.size))
     # sort indexes by frequency, lower -> higher
     indexes.sort(key=lambda inp: np.absolute(freq[inp]))
-    time = np.arange(0, num + n_predict)
+    time = np.arange(0, x_data.size + n_predict)
     restored_sig = np.zeros(time.size)
     for i in indexes[:1 + n_harm * 2]:
-        amplitude = np.absolute(x_freqdom[i]) / num
+        amplitude = np.absolute(x_freqdom[i]) / x_data.size
         phase = np.angle(x_freqdom[i])
         restored_sig += \
             amplitude * np.cos(2 * np.pi * freq[i] * time + phase)
-    res = restored_sig + p[0] * time
-    res_ts = ts[-n_predict:] + (n_predict / 12)
-    tuple_ = (res[-n_predict:], res_ts)
+    res = restored_sig + poly[0] * time
+    tuple_ = (res[-n_predict:], times[-n_predict:] + (n_predict / 12))
     return tuple_
