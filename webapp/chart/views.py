@@ -39,6 +39,13 @@ def draw():
     return render_template("chart/chart.html", x=dat1, y=dat2)
 
 
+@blueprint.route("/pie")
+def draw_pie():
+    """ draw pie function """
+    time, data = load_sunspots_lists()
+    return render_template("chart/pie.html", x=time, y=data)
+
+
 @blueprint.route("/bar_plot")
 def bar_plot():
     """ bar_plot function """

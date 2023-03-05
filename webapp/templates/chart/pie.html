@@ -1,0 +1,23 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+var data = [{
+  values: [15, 6, 5, 4, 42],
+  labels: ['China', 'Russian Federation', 'Brazil', 'India', 'Rest of World'],
+  name: 'GHG Emissions',
+  hoverinfo: 'label+percent+name',
+  type: 'pie'
+}];
+var layout = {
+  height: 400,
+  width: 500
+};
+var config = {responsive: true};
+// Display using Plotly
+Plotly.newPlot('myPlot', data, layout, config);
+</script>
+
+{% endblock %}
