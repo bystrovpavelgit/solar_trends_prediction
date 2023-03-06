@@ -27,6 +27,24 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertEqual(res[1:5], [5.0, 4.5, 5.25, 4.625],
                          "равен [5.0, 4.5, 5.25, 4.625]")
 
+    def test_exponential_smoothing_negatively2(self):
+        """ exponential_smoothing юнит-тест """
+        try:
+            res = exponential_smoothing([4], -0.5)
+
+            self.assertIsNotNone(res)
+        except ValueError as err:
+            self.assertIsNotNone(err, "ValueError")
+
+    def test_exponential_smoothing_negatively3(self):
+        """ exponential_smoothing юнит-тест """
+        try:
+            res = exponential_smoothing([], 0.1)
+
+            self.assertIsNotNone(res)
+        except ValueError as err:
+            self.assertIsNotNone(err, "ValueError")
+
     def test_double_exponential_smoothing(self):
         """ double_exponential_smoothing юнит-тест """
         date = [4, 6, 4, 6, 4, 6]
