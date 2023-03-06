@@ -55,6 +55,24 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertEqual(res[1:5], [8.0, 7.0, 7.25, 5.5625],
                          "равен (8.0, 7.0, 7.25, 5.5625)")
 
+    def test_double_exponential_smoothing_negatively2(self):
+        """ double_exponential_smoothing юнит-тест """
+        try:
+            res = double_exponential_smoothing([], 0.1, 0.5)
+
+            self.assertIsNotNone(res)
+        except ValueError as err:
+            self.assertIsNotNone(err, "ValueError")
+
+    def test_double_exponential_smoothing_negatively3(self):
+        """ double_exponential_smoothing юнит-тест """
+        try:
+            res = double_exponential_smoothing([4], -0.1, -0.5)
+
+            self.assertIsNotNone(res)
+        except ValueError as err:
+            self.assertIsNotNone(err, "ValueError")
+
     def test_get_optimal_params(self):
         """ юнит-тест для get_optimal_params func """
         dataset = get_enriched_dataframe()
