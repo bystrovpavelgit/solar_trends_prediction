@@ -6,9 +6,11 @@ import logging
 import numpy as np
 from flask import Blueprint, render_template
 from numpy import hstack
-from webapp.utils.dataframe_util import sunspot_numbers
-from webapp.dl_logic import predict_next_cycle, predict_two_cycles
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
+from webapp.dl_logic import predict_next_cycle, predict_two_cycles
+from webapp.utils.dataframe_util import sunspot_numbers, \
+    get_enriched_dataframe
+
 
 blueprint = Blueprint("chart", __name__, url_prefix="/chart")
 
@@ -40,10 +42,18 @@ def draw():
 
 
 @blueprint.route("/pie")
-def draw_pie():
-    """ draw pie function """
-    time, data = load_sunspots_lists()
-    return render_template("chart/pie.html", x=time, y=data)
+def show_data():
+    """ show data availability using pie-chart """
+    df = get_enriched_dataframe()
+    cent1 = df[df["year_float"] < 1800.]["year_float"].count()
+    cond1 = (df["year_float"] < 1900.) & (1800. <= df["year_float"])
+    cent2 = df[cond1]["year_float"].count()
+    cond2 = (df["year_float"] < 2000.) & (1900. <= df["year_float"])
+    cent3 = df[cond2]["year_float"].count()
+    cent4 = df[df["year_float"] >= 2000.]["Year"].count()
+    res = [cent1, cent2, cent3, cent4]
+    labels = [18, 19, 20, 21]
+    return render_template("chart/pie.html", data=labels, y=res)
 
 
 @blueprint.route("/bar_plot")

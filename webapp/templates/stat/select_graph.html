@@ -15,7 +15,8 @@
 				{% endif %}
 			{% endwith %}
             <form action="{{ url_for('stat.process_smoothing')}}" method="POST">
-                {{ title }}<br>
+                <center>{{ title }}</center>
+                <br>
                 <select class="form-select form-select-lg mb-3" aria-label="select-lg example" name="smoothing">
                   <option selected>{{ selected }}</option>
                   <option value="скользязщее среднее 3г">скользязщее среднее 3г</option>
@@ -43,7 +44,7 @@ var data = [
   {x: {{ time }} , y: {{ y2 }} , mode: 'lines', name: 'Smoothed curve'},
 ];
 
-var layout = {title: "Graph of the exponential smoothing for the sunspots numbers curve", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+var layout = {title: "Экспоненциально сглаженная кривая для графика солнечных пятен", xaxis: {title: "годы", showgrid: true}, yaxis: {title: 'кол-во солнечных пятен'}};
 
 // Display using Plotly
 Plotly.newPlot("myPlot", data, layout);
