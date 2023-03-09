@@ -28,22 +28,18 @@ class TrendsUtilTest(unittest.TestCase):
                          "равен [5.0, 4.5, 5.25, 4.625]")
 
     def test_exponential_smoothing_negatively2(self):
-        """ exponential_smoothing юнит-тест """
-        try:
-            res = exponential_smoothing([4], -0.5)
+        """ exponential_smoothing юнит-тест 2 """
+        input1 = [4]
+        input2 = -0.5
 
-            self.assertIsNotNone(res)
-        except ValueError as err:
-            self.assertIsNotNone(err, "ValueError")
+        self.assertRaises(ValueError, exponential_smoothing, input1, input2)
 
     def test_exponential_smoothing_negatively3(self):
-        """ exponential_smoothing юнит-тест """
-        try:
-            res = exponential_smoothing([], 0.1)
+        """ exponential_smoothing юнит-тест 3 """
+        input1 = []
+        input2 = 0.1
 
-            self.assertIsNotNone(res)
-        except ValueError as err:
-            self.assertIsNotNone(err, "ValueError")
+        self.assertRaises(ValueError, exponential_smoothing, input1, input2)
 
     def test_double_exponential_smoothing(self):
         """ double_exponential_smoothing юнит-тест """
@@ -57,21 +53,16 @@ class TrendsUtilTest(unittest.TestCase):
 
     def test_double_exponential_smoothing_negatively2(self):
         """ double_exponential_smoothing юнит-тест """
-        try:
-            res = double_exponential_smoothing([], 0.1, 0.5)
 
-            self.assertIsNotNone(res)
-        except ValueError as err:
-            self.assertIsNotNone(err, "ValueError")
+        self.assertRaises(ValueError,
+                          double_exponential_smoothing,
+                          [4],
+                          -0.1,
+                          -0.5)
 
     def test_double_exponential_smoothing_negatively3(self):
         """ double_exponential_smoothing юнит-тест """
-        try:
-            res = double_exponential_smoothing([4], -0.1, -0.5)
-
-            self.assertIsNotNone(res)
-        except ValueError as err:
-            self.assertIsNotNone(err, "ValueError")
+        self.assertRaises(ValueError, double_exponential_smoothing, [], .1, .5)
 
     def test_get_optimal_params(self):
         """ юнит-тест для get_optimal_params func """

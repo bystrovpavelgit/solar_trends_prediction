@@ -71,8 +71,10 @@ class HoltWinters:
     def __init__(self, series, season_len, alpha, beta, gamma, n_preds,
                  scaling_factor=1.96):
         """ init """
-        if n_preds < 0:
-            raise ValueError("n_preds should be positive")
+        if series is None or n_preds < 0:
+            raise ValueError("Invalid arguments")
+        if len(series) < season_len:
+            raise ValueError("Length should be >= season_len")
         self.series = series
         self.slen = season_len
         self.alpha = alpha

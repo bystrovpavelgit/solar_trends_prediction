@@ -7,6 +7,20 @@ import webapp.utils.trends_util
 
 class HoltWintersTest(unittest.TestCase):
     """ HoltWinters class Tests """
+    def test_holt_winters_init_negatively1(self):
+        """ юнит-тест для метода Хольта-Винтерся"""
+        clazz = webapp.utils.trends_util.HoltWinters
+        trend = pd.Series([1, 2])
+
+        self.assertRaises(ValueError, clazz, trend, 2, .1, .5, .5, -1)
+
+    def test_holt_winters_init_negatively2(self):
+        """ юнит-тест 2 для метода Хольта-Винтерся"""
+        clazz = webapp.utils.trends_util.HoltWinters
+        trend = pd.Series([1])
+
+        self.assertRaises(ValueError, clazz, trend, 5, .1, .5, .5, 1)
+
     def test_holt_winters_initial_trend(self):
         """ initial_trend test """
         trend = pd.Series([1] * 11)
