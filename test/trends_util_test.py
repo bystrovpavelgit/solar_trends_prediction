@@ -97,7 +97,7 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertEqual(gamma, 0, "gamma == 0")
 
     def test_hw_exponential_smoothing(self):
-        """ юнит-тест для triple exponential smoothing """
+        """ юнит-тест для hw_exponential_smoothing """
         data = get_enriched_dataframe()
         size = len(data["sunspots"].values)
 
@@ -106,3 +106,15 @@ class TrendsUtilTest(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(len(result), size, f"minimums равен {size}")
         self.assertTrue(result[-1] > 0, " > 0")
+
+    def test_hw_exponential_smoothing_negatively2(self):
+        """ юнит-тест 2 для hw_exponential_smoothing """
+        data = pd.Series([])
+
+        self.assertRaises(ValueError, hw_exponential_smoothing, data, sess_len=1)
+
+    def test_hw_exponential_smoothing_negatively3(self):
+        """ юнит-тест 3 для hw_exponential_smoothing """
+        data = pd.Series([1])
+
+        self.assertRaises(ValueError, hw_exponential_smoothing, data, sess_len=-1)
