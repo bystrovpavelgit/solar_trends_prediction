@@ -34,6 +34,18 @@ def load_sunspots_lists():
     return data1, data2
 
 
+def count_sunspots_data(dframe):
+    """ count sunspots data """
+    cent1 = dframe[dframe["year_float"] < 1800.]["year_float"].count()
+    cond1 = (dframe["year_float"] < 1900.) & (1800. <= dframe["year_float"])
+    cent2 = dframe[cond1]["year_float"].count()
+    cond2 = (dframe["year_float"] < 2000.) & (1900. <= dframe["year_float"])
+    cent3 = dframe[cond2]["year_float"].count()
+    cent4 = dframe[dframe["year_float"] >= 2000.]["year_float"].count()
+    result = [cent1, cent2, cent3, cent4]
+    return result
+
+
 @blueprint.route("/chart")
 def draw():
     """ draw function """
@@ -41,19 +53,13 @@ def draw():
     return render_template("chart/chart.html", x=dat1, y=dat2)
 
 
-@blueprint.route("/pie")
+@blueprint.route("/input_stat")
 def show_data():
     """ show data availability using pie-chart """
-    df = get_enriched_dataframe()
-    cent1 = df[df["year_float"] < 1800.]["year_float"].count()
-    cond1 = (df["year_float"] < 1900.) & (1800. <= df["year_float"])
-    cent2 = df[cond1]["year_float"].count()
-    cond2 = (df["year_float"] < 2000.) & (1900. <= df["year_float"])
-    cent3 = df[cond2]["year_float"].count()
-    cent4 = df[df["year_float"] >= 2000.]["Year"].count()
-    res = [cent1, cent2, cent3, cent4]
+    data = get_enriched_dataframe()
+    result = count_sunspots_data(data)
     labels = [18, 19, 20, 21]
-    return render_template("chart/pie.html", data=labels, y=res)
+    return render_template("chart/input_statistics.html", data=labels, y=result)
 
 
 @blueprint.route("/bar_plot")

@@ -39,7 +39,7 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(len(result1[1]), len(sunspots))
         self.assertEqual(len(result2[1]), len(sunspots))
         self.assertEqual(len(result1[2]), len(smoothed3))
-        self.assertEqual(len(result2[3]), len(smoothed12))
+        self.assertEqual(len(result2[2]), len(smoothed12))
         self.assertEqual(result1[2][0], smoothed3[0])
         self.assertEqual(result1[2][-1], smoothed3[-1])
         self.assertEqual(result2[2][0], smoothed12[0])
