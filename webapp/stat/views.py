@@ -5,11 +5,11 @@
 import logging
 from flask import Blueprint, render_template, request, flash
 from webapp.config import VALID_VALUES
-from webapp.utils.dataframe_util import get_enriched_dataframe
+from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
 from webapp.utils.enrich_sunspots import get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
     double_exponential_smoothing, hw_exponential_smoothing, \
-    get_fourier_prediction
+    get_fourier_prediction, linear_regression_prediction
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
@@ -134,3 +134,16 @@ def fourier():
                            y=sunspots.tolist(),
                            time2=time2.tolist(),
                            y2=preds.tolist())
+
+
+@blueprint.route("/linear")
+def predict_with_linear_method():
+    """ display fourier method predictions """
+    data = prepare_data()
+    time = data["year_float"].values.tolist()
+    sunspots = data["sunspots"].values.tolist()
+    predicted = linear_regression_prediction(data).tolist()
+    return render_template("stat/linear_regression.html",
+                           time=time,
+                           y=sunspots,
+                           y2=predicted)

@@ -59,8 +59,8 @@ def sunspot_numbers(csv_file: str = "data/sunspot_numbers.csv") -> Optional:
     """ returns sunspot numbers data """
     try:
         data = pd.read_csv(csv_file, delimiter=";")
-        year_float = data['year_float'].values
-        sunspots = data['sunspots'].values
+        year_float = data["year_float"].values
+        sunspots = data["sunspots"].values
         return Optional.of((year_float, sunspots))
     except FileNotFoundError:
         message = f"File {csv_file} not found"
@@ -76,9 +76,9 @@ def get_users_timeseries(csv_file: str = "data/hour_online.csv") -> Optional:
     try:
         times = pd.read_csv(csv_file)
         # fill the first value of 34002 instead of NA
-        times["mean_12p"] = rolling_mean(times['Users'], 12).fillna(34002)
-        times["mean_36p"] = rolling_mean(times['Users'], 36).fillna(34002)
-        times["mean_128p"] = rolling_mean(times['Users'], 128).fillna(34002)
+        times["mean_12p"] = rolling_mean(times["Users"], 12).fillna(34002)
+        times["mean_36p"] = rolling_mean(times["Users"], 36).fillna(34002)
+        times["mean_128p"] = rolling_mean(times["Users"], 128).fillna(34002)
         return Optional.of(times)
     except FileNotFoundError:
         message = f"File not found {csv_file}"
@@ -92,11 +92,11 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
        with min, max and average number of sunspots
     """
     data = pd.read_csv(csv_file, delimiter=";")
-    trend = data['sunspots'].values
+    trend = data["sunspots"].values
     # calculate moving average
-    data["mean_1y"] = rolling_mean(data['sunspots'], 12)
-    data["mean_3y"] = rolling_mean(data['sunspots'], 36)
-    data["mean_12y"] = rolling_mean(data['sunspots'], 128)
+    data["mean_1y"] = rolling_mean(data["sunspots"], 12)
+    data["mean_3y"] = rolling_mean(data["sunspots"], 36)
+    data["mean_12y"] = rolling_mean(data["sunspots"], 128)
     # fill the first value of 96.7 instead of NA
     data["mean_1y"] = data["mean_1y"].fillna(96.7)
     data["mean_3y"] = data["mean_3y"].fillna(96.7)
@@ -128,4 +128,18 @@ def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
                     np.zeros([indices[-1] - indices[8]])])
     data["y_min"] = pd.Series(y_min.tolist())
     data["y_max"] = pd.Series(y_max.tolist())
+    return data
+
+
+def prepare_data(csv_file="data/sunspot_numbers.csv",
+                 lag_start=1,
+                 lag_end=24):
+    """ """
+    data = pd.read_csv(csv_file, delimiter=";")
+    # lags of series
+    for i in range(lag_start, (lag_end + 1)):
+        data[f"lag_{i}"] = data.sunspots.shift(i).fillna(0.)
+    final_lag = 12
+    for i in range(3, (final_lag + 1)):
+        data[f"lag_{i * 12}"] = data.sunspots.shift(i * 12).fillna(0.)
     return data

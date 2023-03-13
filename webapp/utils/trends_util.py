@@ -7,8 +7,10 @@ import numpy as np
 from numpy import array, fft
 from pandas import Series
 from scipy.optimize import minimize
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 
 def exponential_smoothing(series, alpha):
@@ -276,3 +278,22 @@ def get_fourier_prediction(x_data: array, times: array,
     res = restored_sig + poly[0] * time
     tuple_ = (res[-n_predict:], times[-n_predict:] + (n_predict / 12))
     return tuple_
+
+
+def linear_regression_prediction(frame: Series) -> array:
+    """ calculate fourier amplitudes using numpy.fft """
+    if frame is None:
+        raise ValueError("Input frame must be non empty")
+    scaler = StandardScaler()
+    names = [f"lag_{num}" for num in range(1, 25)]
+    final_lag = 12
+    for i in range(3, (final_lag + 1)):
+        names.append(f"lag_{i * 12}")
+    y_train = frame.sunspots.values
+    x_train = frame[names].values
+    x_scaled = scaler.fit_transform(x_train)
+
+    reg = LinearRegression()
+    reg.fit(x_scaled, y_train)
+    y_predicted = reg.predict(x_scaled)
+    return y_predicted
