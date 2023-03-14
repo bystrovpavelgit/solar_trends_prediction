@@ -7,9 +7,9 @@ import numpy as np
 from numpy import array, fft
 from pandas import Series
 from scipy.optimize import minimize
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
 
 
@@ -296,4 +296,25 @@ def linear_regression_prediction(frame: Series) -> array:
     reg = LinearRegression()
     reg.fit(x_scaled, y_train)
     y_predicted = reg.predict(x_scaled)
-    return y_predicted
+    mse = mean_absolute_error(y_train, y_predicted)
+    return y_predicted, mse
+
+
+def ridge_regression_prediction(frame: Series) -> array:
+    """ calculate fourier amplitudes using numpy.fft """
+    if frame is None:
+        raise ValueError("Input frame must be non empty")
+    scaler = StandardScaler()
+    names = [f"lag_{num}" for num in range(1, 25)]
+    final_lag = 12
+    for i in range(3, (final_lag + 1)):
+        names.append(f"lag_{i * 12}")
+    y_train = frame.sunspots.values
+    x_train = frame[names].values
+    x_scaled = scaler.fit_transform(x_train)
+
+    reg = Ridge(alpha=0.2)
+    reg.fit(x_scaled, y_train)
+    y_predicted = reg.predict(x_scaled)
+    mse = mean_absolute_error(y_train, y_predicted)
+    return y_predicted, mse

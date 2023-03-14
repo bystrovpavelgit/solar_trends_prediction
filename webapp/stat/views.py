@@ -9,7 +9,8 @@ from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
 from webapp.utils.enrich_sunspots import get_results_for_best_classifier
 from webapp.utils.trends_util import exponential_smoothing, \
     double_exponential_smoothing, hw_exponential_smoothing, \
-    get_fourier_prediction, linear_regression_prediction
+    get_fourier_prediction, linear_regression_prediction, \
+    ridge_regression_prediction
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 
@@ -137,13 +138,28 @@ def fourier():
 
 
 @blueprint.route("/linear")
-def predict_with_linear_method():
-    """ display fourier method predictions """
+def regression_prediction():
+    """ display linear regression predictions """
     data = prepare_data()
     time = data["year_float"].values.tolist()
     sunspots = data["sunspots"].values.tolist()
-    predicted = linear_regression_prediction(data).tolist()
+    predicted, mae = linear_regression_prediction(data)
+    print(f"MAE: {mae}")
     return render_template("stat/linear_regression.html",
                            time=time,
                            y=sunspots,
-                           y2=predicted)
+                           y2=predicted.tolist())
+
+
+@blueprint.route("/ridge")
+def ridge_prediction():
+    """ display ridge regression predictions """
+    data = prepare_data()
+    time = data["year_float"].values.tolist()
+    sunspots = data["sunspots"].values.tolist()
+    predicted, mae = ridge_regression_prediction(data)
+    print(f"MAE: {mae}")
+    return render_template("stat/linear_regression.html",
+                           time=time,
+                           y=sunspots,
+                           y2=predicted.tolist())
