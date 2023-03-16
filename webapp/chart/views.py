@@ -59,7 +59,9 @@ def show_data():
     data = get_enriched_dataframe()
     result = count_sunspots_data(data)
     labels = [18, 19, 20, 21]
-    return render_template("chart/input_statistics.html", data=labels, y=result)
+    return render_template("chart/input_statistics.html",
+                           data=labels,
+                           y=result)
 
 
 @blueprint.route("/bar_plot")

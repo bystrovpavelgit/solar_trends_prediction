@@ -16,5 +16,6 @@ REMEMBER_COOKIE_DURATION = timedelta(days=15)
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 VALID_VALUES = ["скользязщее среднее 3г", "скользязщее среднее 12л",
                 "экспоненциальный", "двойной", "тройной"]
+REGRESSION_VALUES = ["Linear", "Lasso", "Ridge"]
 RNN_INPUT_SIZE = 1152
 RNN_OUTPUT_SIZE = 128

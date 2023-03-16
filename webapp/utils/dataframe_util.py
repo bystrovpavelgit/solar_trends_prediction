@@ -86,7 +86,8 @@ def get_users_timeseries(csv_file: str = "data/hour_online.csv") -> Optional:
         return Optional.empty()
 
 
-def get_enriched_dataframe(csv_file="data/sunspot_numbers.csv"):
+def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv")\
+        -> pd.DataFrame:
     """
        enrich dataframe with 1y, 3y and 128 months moving averages and
        with min, max and average number of sunspots

@@ -7,7 +7,7 @@ import numpy as np
 from numpy import array, fft
 from pandas import Series
 from scipy.optimize import minimize
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
@@ -231,8 +231,7 @@ def get_optimal_params(data):
     # минимизируем L
     opt = minimize(timeseries_cv_func, x0=args, method="TNC",
                    bounds=((0, 1), (0, 1), (0, 1)))
-    result = opt.x
-    return result
+    return opt.x
 
 
 def hw_exponential_smoothing(data: Series, sess_len: int = 128) -> list:
@@ -280,10 +279,24 @@ def get_fourier_prediction(x_data: array, times: array,
     return tuple_
 
 
-def linear_regression_prediction(frame: Series) -> array:
-    """ calculate fourier amplitudes using numpy.fft """
-    if frame is None:
-        raise ValueError("Input frame must be non empty")
+def prediction_by_type(type_: str, dataframe: Series) -> tuple:
+    """ regression prediction by type """
+    if type_ is None or dataframe is None:
+        raise ValueError("Input attribute must be non empty")
+    if type_ == "Lasso":
+        regression = Lasso(alpha=0.2)
+    elif type_ == "Ridge":
+        regression = Ridge(alpha=0.2)
+    else:
+        regression = LinearRegression()
+    result = regression_prediction(regression, dataframe)
+    return result
+
+
+def regression_prediction(reg, frame):
+    """ regression prediction """
+    if reg is None or frame is None:
+        raise ValueError("Input attribute must be non empty")
     scaler = StandardScaler()
     names = [f"lag_{num}" for num in range(1, 25)]
     final_lag = 12
@@ -293,27 +306,6 @@ def linear_regression_prediction(frame: Series) -> array:
     x_train = frame[names].values
     x_scaled = scaler.fit_transform(x_train)
 
-    reg = LinearRegression()
-    reg.fit(x_scaled, y_train)
-    y_predicted = reg.predict(x_scaled)
-    mse = mean_absolute_error(y_train, y_predicted)
-    return y_predicted, mse
-
-
-def ridge_regression_prediction(frame: Series) -> array:
-    """ calculate fourier amplitudes using numpy.fft """
-    if frame is None:
-        raise ValueError("Input frame must be non empty")
-    scaler = StandardScaler()
-    names = [f"lag_{num}" for num in range(1, 25)]
-    final_lag = 12
-    for i in range(3, (final_lag + 1)):
-        names.append(f"lag_{i * 12}")
-    y_train = frame.sunspots.values
-    x_train = frame[names].values
-    x_scaled = scaler.fit_transform(x_train)
-
-    reg = Ridge(alpha=0.2)
     reg.fit(x_scaled, y_train)
     y_predicted = reg.predict(x_scaled)
     mse = mean_absolute_error(y_train, y_predicted)

@@ -111,10 +111,12 @@ class TrendsUtilTest(unittest.TestCase):
         """ юнит-тест 2 для hw_exponential_smoothing """
         data = pd.Series([])
 
-        self.assertRaises(ValueError, hw_exponential_smoothing, data, sess_len=1)
+        self.assertRaises(ValueError, hw_exponential_smoothing,
+                          data, sess_len=1)
 
     def test_hw_exponential_smoothing_negatively3(self):
         """ юнит-тест 3 для hw_exponential_smoothing """
         data = pd.Series([1])
 
-        self.assertRaises(ValueError, hw_exponential_smoothing, data, sess_len=-1)
+        self.assertRaises(ValueError, hw_exponential_smoothing,
+                          data, sess_len=-1)
