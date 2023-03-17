@@ -5,9 +5,10 @@
 import unittest
 import numpy as np
 import pandas as pd
-from webapp.utils.dataframe_util import get_enriched_dataframe
-from webapp.utils.trends_util import exponential_smoothing, \
-    double_exponential_smoothing, get_optimal_params, hw_exponential_smoothing
+from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
+from webapp.utils.trends_util import prediction_by_type, get_optimal_params, \
+    double_exponential_smoothing, exponential_smoothing, \
+    hw_exponential_smoothing
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -120,3 +121,28 @@ class TrendsUtilTest(unittest.TestCase):
 
         self.assertRaises(ValueError, hw_exponential_smoothing,
                           data, sess_len=-1)
+
+    def test_prediction_by_type_linear(self):
+        """ юнит-тест для prediction by type linear """
+        data = prepare_data()
+
+        predicted, mae = prediction_by_type("Linear", data)
+
+        self.assertEqual(predicted[0], 4.311016530012111)
+        self.assertEqual(mae, 17.41632947476143)
+
+    def test_prediction_by_type_ridge(self):
+        """ юнит-тест для prediction by type ridge """
+        data = prepare_data()
+
+        predicted, mae = prediction_by_type("Ridge", data)
+        print(predicted[0], mae)
+
+        self.assertEqual(predicted[0], 4.312483124346727)
+        self.assertEqual(mae, 17.41649514118986)
+
+    def test_prediction_by_type_negative(self):
+        """ negative юнит-тест для prediction by type """
+        data = None
+
+        self.assertRaises(ValueError, prediction_by_type, "", data)
