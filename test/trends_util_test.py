@@ -5,10 +5,11 @@
 import unittest
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LinearRegression, Ridge
 from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
 from webapp.utils.trends_util import prediction_by_type, get_optimal_params, \
     double_exponential_smoothing, exponential_smoothing, \
-    hw_exponential_smoothing
+    hw_exponential_smoothing, regression_prediction
 
 
 class TrendsUtilTest(unittest.TestCase):
@@ -136,7 +137,6 @@ class TrendsUtilTest(unittest.TestCase):
         data = prepare_data()
 
         predicted, mae = prediction_by_type("Ridge", data)
-        print(predicted[0], mae)
 
         self.assertEqual(predicted[0], 4.312483124346727)
         self.assertEqual(mae, 17.41649514118986)
@@ -146,3 +146,29 @@ class TrendsUtilTest(unittest.TestCase):
         data = None
 
         self.assertRaises(ValueError, prediction_by_type, "", data)
+
+    def test_regression_prediction_linear(self):
+        """ юнит-тест для regression_prediction """
+        data = prepare_data()
+        reg = LinearRegression()
+
+        predicted, mae = regression_prediction(reg, data)
+
+        self.assertEqual(predicted[0], 4.311016530012111)
+        self.assertEqual(mae, 17.41632947476143)
+
+    def test_regression_prediction_ridge(self):
+        """ юнит-тест для regression_prediction """
+        data = prepare_data()
+        reg = Ridge(alpha=0.2)
+
+        prediction, mae = regression_prediction(reg, data)
+
+        self.assertEqual(prediction[0], 4.312483124346727)
+        self.assertEqual(mae, 17.41649514118986)
+
+    def test_regression_prediction_negative(self):
+        """ negative юнит-тест для regression_prediction """
+        data = None
+
+        self.assertRaises(ValueError, regression_prediction, None, data)
