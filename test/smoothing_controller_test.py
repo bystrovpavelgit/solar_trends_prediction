@@ -3,7 +3,8 @@
     tests for deep learning logic
 """
 import unittest
-from webapp.stat.views import get_smoothed_data_by_type
+from webapp.stat.controller.smoothing_controller import \
+    get_smoothed_data_by_type
 from webapp.utils.dataframe_util import get_enriched_dataframe
 
 
