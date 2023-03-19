@@ -7,6 +7,7 @@ from copy import copy
 import numpy as np
 from numpy import hstack
 from tensorflow import keras
+from tensorflow.keras import models, layers
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
 
 
@@ -47,3 +48,13 @@ def predict_two_cycles(data, timeseries):
     result2 = hstack([next_data, pred2])
     res_ts2 = hstack([res_ts, pred_ts2])
     return result2, res_ts2
+
+
+def get_two_layers_nnet():
+    """ prepare two layers neural net """
+    model = models.Sequential()
+    model.add(layers.Dense(34, activation="tanh", input_shape=(34,)))
+    model.add(layers.Dense(12, activation="tanh"))
+    model.add(layers.Dense(1))
+    model.compile(optimizer="adam", loss="mse", metrics=["mae"])
+    return model
