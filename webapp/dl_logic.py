@@ -23,6 +23,7 @@ def load_rnn_model(file_name="models/sn_2lvl_rnn.h5"):
 
 
 SUNSPOTS_MODEL = load_rnn_model(file_name="models/sn_2lvl_rnn.h5")
+LAGS_DNN_MODEL = load_rnn_model(file_name="models/two_layer_dnn.h5")
 
 
 def predict_next_cycle(data, timeseries):
@@ -54,7 +55,33 @@ def get_two_layers_nnet():
     """ prepare two layers neural net """
     model = models.Sequential()
     model.add(layers.Dense(34, activation="tanh", input_shape=(34,)))
+    model.add(layers.Dropout(0.1))
     model.add(layers.Dense(12, activation="tanh"))
     model.add(layers.Dense(1))
     model.compile(optimizer="adam", loss="mse", metrics=["mae"])
+    return model
+
+
+def train_lags_dnn_model(data, fields):
+    """ train_lags_dnn_model """
+    np.random.seed(212)
+    df = data
+    lags = fields
+    model = get_two_layers_nnet()
+
+    n = len(df["sunspots"].values)
+    nums = np.array(np.arange(n))
+    np.random.shuffle(nums)
+    rands = nums[72:].tolist()
+    x = df[lags].values[rands]
+    y = df["sunspots"].values[rands]
+    x_test = df[lags].values[nums[:72]]
+    y_test = df["sunspots"].values[nums[:72]]
+    mean = df[lags].values.mean(axis=0)
+    std = df[lags].values.std(axis=0)
+    x = (x - mean) / std
+    x_test = (x_test - mean) / std
+
+    model.fit(x, y, epochs=600, batch_size=64,
+              validation_data=(x_test, y_test))
     return model
