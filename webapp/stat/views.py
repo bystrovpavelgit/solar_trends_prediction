@@ -27,11 +27,10 @@ def process_smoothing():
     selected = VALID_VALUES[0]
     if request.method == "POST":
         type_ = request.form.get("smoothing")
+        selected = type_
         if type_ is None or type_ not in VALID_VALUES:
             log_and_flash(f"неверный тип сглаживания: {type_}")
             return redirect("/")
-        else:
-            selected = type_
     result = get_smoothed_data_by_type(selected)
     return render_template("stat/select_graph.html",
                            title="Выбор сглаживания",
@@ -77,11 +76,10 @@ def regression_prediction():
     selected = REGRESSION_VALUES[0]
     if request.method == "POST":
         type_ = request.form.get("regression")
+        selected = type_
         if type_ not in REGRESSION_VALUES:
             log_and_flash(f"неверный тип регрессии: {type_}")
             return redirect("/")
-        else:
-            selected = type_
     data = prepare_data()
     time = data["year_float"].values.tolist()
     sunspots = data["sunspots"].values.tolist()
