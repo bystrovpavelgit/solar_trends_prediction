@@ -6,6 +6,7 @@ import logging
 from copy import copy
 import numpy as np
 from numpy import hstack
+from sklearn.metrics import mean_absolute_error
 from tensorflow import keras
 from tensorflow.keras import models, layers
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
@@ -65,23 +66,34 @@ def get_two_layers_nnet():
 def train_lags_dnn_model(data, fields):
     """ train_lags_dnn_model """
     np.random.seed(212)
-    df = data
     lags = fields
     model = get_two_layers_nnet()
-
-    n = len(df["sunspots"].values)
-    nums = np.array(np.arange(n))
+    num = len(data["sunspots"].values)
+    nums = np.array(np.arange(num))
     np.random.shuffle(nums)
     rands = nums[72:].tolist()
-    x = df[lags].values[rands]
-    y = df["sunspots"].values[rands]
-    x_test = df[lags].values[nums[:72]]
-    y_test = df["sunspots"].values[nums[:72]]
-    mean = df[lags].values.mean(axis=0)
-    std = df[lags].values.std(axis=0)
-    x = (x - mean) / std
+    x_train = data[lags].values[rands]
+    y_train = data["sunspots"].values[rands]
+    x_test = data[lags].values[nums[:72]]
+    y_test = data["sunspots"].values[nums[:72]]
+    mean = data[lags].values.mean(axis=0)
+    std = data[lags].values.std(axis=0)
+    x_train = (x_train - mean) / std
     x_test = (x_test - mean) / std
 
-    model.fit(x, y, epochs=600, batch_size=64,
+    model.fit(x_train, y_train, epochs=600, batch_size=64,
               validation_data=(x_test, y_test))
     return model
+
+
+def calculate_dnn_prediction(x_data: np.array, y_data: np.array) -> np.array:
+    """ calculate dnn prediction """
+    if x_data is None or y_data is None:
+        raise ValueError("Empty input arguments")
+    mdl = get_two_layers_nnet() if LAGS_DNN_MODEL is None else LAGS_DNN_MODEL
+    means = x_data.mean()
+    std = x_data.std()
+    x_data = (x_data - means) / std
+    result = mdl.predict(x_data).reshape(-1)
+    mae = mean_absolute_error(y_data, result)
+    return result, mae

@@ -3,8 +3,7 @@
     tests for deep learning logic
 """
 import unittest
-from webapp.stat.controller.smoothing_controller import \
-    get_smoothed_data_by_type
+from webapp.stat.api import get_smoothed_data_by_type
 from webapp.utils.dataframe_util import get_enriched_dataframe
 
 
@@ -45,3 +44,9 @@ class ViewsTest(unittest.TestCase):
         self.assertEqual(result1[2][-1], smoothed3[-1])
         self.assertEqual(result2[2][0], smoothed12[0])
         self.assertEqual(result2[2][-1], smoothed12[-1])
+
+    def test_get_smoothed_data_by_type_negatively2(self):
+        """ negative unit-test get_smoothed_data_by_type """
+        type_ = None
+
+        self.assertRaises(ValueError, get_smoothed_data_by_type, type_)

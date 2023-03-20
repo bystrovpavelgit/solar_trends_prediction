@@ -1,4 +1,4 @@
-""" curve smoothing controller """
+""" api for stat views """
 from webapp.config import VALID_VALUES
 from webapp.utils.dataframe_util import get_enriched_dataframe
 from webapp.utils.trends_util import exponential_smoothing, \
@@ -6,7 +6,7 @@ from webapp.utils.trends_util import exponential_smoothing, \
 
 
 def get_smoothed_data_by_type(smooth_type: str) -> tuple:
-    """ get data Series by type """
+    """ get smoothed data according to type """
     if smooth_type is None:
         raise ValueError("smooth_type is empty")
     data = get_enriched_dataframe()

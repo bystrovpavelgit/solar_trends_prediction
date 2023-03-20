@@ -9,8 +9,7 @@ from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
 from webapp.utils.enrich_sunspots import get_results_for_best_classifier
 from webapp.utils.trends_util import get_fourier_prediction, \
     prediction_by_type
-from webapp.stat.controller.smoothing_controller import \
-    get_smoothed_data_by_type
+from webapp.stat.api import get_smoothed_data_by_type
 
 blueprint = Blueprint("stat", __name__, url_prefix="/stat")
 

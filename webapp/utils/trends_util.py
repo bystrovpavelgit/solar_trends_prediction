@@ -5,12 +5,14 @@
 from functools import partial
 import numpy as np
 from numpy import array, fft
-from pandas import Series
+from pandas import DataFrame, Series
 from scipy.optimize import minimize
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
+from webapp.config import REGRESSION_VALUES
+from webapp.dl_logic import calculate_dnn_prediction
 
 
 def exponential_smoothing(series, alpha):
@@ -279,14 +281,27 @@ def get_fourier_prediction(x_data: array, times: array,
     return tuple_
 
 
-def prediction_by_type(type_: str, dataframe: Series) -> tuple:
+def get_lag_fields():
+    """ get lag fields """
+    final_lag = 12
+    names = [f"lag_{num}" for num in range(1, 25)]
+    names += [f"lag_{i * 12}" for i in range(3, (final_lag + 1))]
+    return names
+
+
+def prediction_by_type(type_: str, dataframe: DataFrame) -> tuple:
     """ regression prediction by type """
     if type_ is None or dataframe is None:
         raise ValueError("Input attribute must be non empty")
-    if type_ == "Lasso":
+    if type_ == REGRESSION_VALUES[1]:
         regression = Lasso(alpha=0.2)
-    elif type_ == "Ridge":
+    elif type_ == REGRESSION_VALUES[2]:
         regression = Ridge(alpha=0.2)
+    elif type_ == REGRESSION_VALUES[3]:
+        x_train = dataframe[get_lag_fields()].values
+        y_true = dataframe["sunspots"].values
+        res = calculate_dnn_prediction(x_train, y_true)
+        return res
     else:
         regression = LinearRegression()
     result = regression_prediction(regression, dataframe)
@@ -298,12 +313,8 @@ def regression_prediction(reg, frame):
     if reg is None or frame is None:
         raise ValueError("Input attribute must be non empty")
     scaler = StandardScaler()
-    names = [f"lag_{num}" for num in range(1, 25)]
-    final_lag = 12
-    for i in range(3, (final_lag + 1)):
-        names.append(f"lag_{i * 12}")
     y_train = frame.sunspots.values
-    x_train = frame[names].values
+    x_train = frame[get_lag_fields()].values
     x_scaled = scaler.fit_transform(x_train)
 
     reg.fit(x_scaled, y_train)
