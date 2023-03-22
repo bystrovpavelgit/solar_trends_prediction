@@ -14,3 +14,4 @@ sklearn
 tensorflow
 xgboost
 optional.py
+fedot
