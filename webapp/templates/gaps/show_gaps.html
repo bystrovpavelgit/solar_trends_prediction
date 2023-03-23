@@ -1,0 +1,37 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+        </div>
+        <div class="col-4">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+				<div class="alert alert-warning" role="alert">
+					{% for message in messages %}
+						{{ message }}<br>
+					{% endfor %}
+				</div>
+				{% endif %}
+			{% endwith %}
+        </div>
+        <div class="col-4">
+        </div>
+    </div>
+</div>
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Define Data
+var data = [
+  {x: {{ time }} , y: {{ y2 }} , mode: 'lines', name: 'Curve with filled gaps'},
+  {x: {{ time }} , y: {{ y }} , mode: 'lines+markers', name: 'Sunspots curve with gaps'},
+];
+
+var layout = {title: "Заполнение пропусков для графика солнечных пятен", xaxis: {title: "годы", showgrid: true}, yaxis: {title: 'кол-во солнечных пятен'}};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+{% endblock %}
