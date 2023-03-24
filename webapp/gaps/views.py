@@ -2,8 +2,11 @@
     Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
     views to display gaps in the data
 """
+import numpy as np
 from flask import Blueprint, render_template
 from webapp.gaps.api import count_gaps
+from webapp.utils.dataframe_util import filtered_minimums, \
+    get_enriched_dataframe
 from webapp.utils.gaps_util import fill_gaps
 
 
@@ -28,3 +31,14 @@ def gaps_stat():
     gaps_num = count_gaps(data["with_gap"])
     arr = [(total - gaps_num), gaps_num]
     return render_template("gaps/input_statistics.html", y=arr)
+
+
+@blueprint.route("/fill")
+def fill():
+    """ fill function """
+    data = get_enriched_dataframe()
+    lst = filtered_minimums(data["mean_1y"], 128)
+    subs = [lst[i] - lst[i - 1] for i in range(1, len(lst))]
+    print(subs)
+    print(np.std(subs), np.mean(subs))
+    return render_template("index.html")

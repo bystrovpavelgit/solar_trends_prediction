@@ -14,7 +14,7 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir,
 SECRET_KEY = "ASDWQYUhj342678gvmjhxckbdvkjbscde"
 REMEMBER_COOKIE_DURATION = timedelta(days=15)
 SQLALCHEMY_TRACK_MODIFICATIONS = True
-VALID_VALUES = ["скользязщее среднее 3г", "скользязщее среднее 12л",
+VALID_VALUES = ["скользязщее среднее 3г", "скользязщее среднее 1г",
                 "экспоненциальный", "двойной", "тройной"]
 REGRESSION_VALUES = ["Linear", "Lasso", "Ridge", "Feed-Forward-Net"]
 RNN_INPUT_SIZE = 1152

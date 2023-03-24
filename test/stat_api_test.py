@@ -24,10 +24,10 @@ class ViewsTest(unittest.TestCase):
         data = get_enriched_dataframe()
         time = data["year_float"].values.tolist()
         sunspots = data["sunspots"].values.tolist()
-        smoothed12 = data["mean_12y"].values.tolist()
+        smoothed12 = data["mean_1y"].values.tolist()
         smoothed3 = data["mean_3y"].values.tolist()
         type1 = "скользязщее среднее 3г"
-        type2 = "скользязщее среднее 12л"
+        type2 = "скользязщее среднее 1г"
 
         result1 = get_smoothed_data_by_type(type1)
         result2 = get_smoothed_data_by_type(type2)

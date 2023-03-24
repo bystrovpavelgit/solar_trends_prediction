@@ -13,7 +13,7 @@ def get_smoothed_data_by_type(smooth_type: str) -> tuple:
     time = data["year_float"].values.tolist()
     sunspots = data["sunspots"].values.tolist()
     if smooth_type == VALID_VALUES[1]:
-        smoothed = data["mean_12y"].values.tolist()
+        smoothed = data["mean_1y"].values.tolist()
     elif smooth_type == VALID_VALUES[2]:
         smoothed = exponential_smoothing(data["sunspots"], .25)
     elif smooth_type == VALID_VALUES[3]:

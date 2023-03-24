@@ -34,6 +34,17 @@ def find_minimums(series: array, length: int) -> list:
     return result
 
 
+def filtered_minimums(series: array, length: int) -> list:
+    """ find all minimums in series """
+    if series is None or length is None:
+        return []
+    res = find_minimums(series, length)
+    indices = [0] + \
+              [i for i in range(1, len(res)) if (res[i] - res[i - 1]) > 63]
+    result = np.array(res)[indices].tolist()
+    return result
+
+
 def rolling_mean(series: Series, num: int) -> Series:
     """
         Calculate average of last n observations
