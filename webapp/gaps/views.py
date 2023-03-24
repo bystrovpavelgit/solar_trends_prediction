@@ -10,7 +10,7 @@ from webapp.utils.gaps_util import fill_gaps
 blueprint = Blueprint("gaps", __name__, url_prefix="/gaps")
 
 
-@blueprint.route("fill_gaps")
+@blueprint.route("/fill_gaps")
 def all_gaps():
     """ fill_gaps function """
     data = fill_gaps()

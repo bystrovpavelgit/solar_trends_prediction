@@ -38,4 +38,8 @@ def create_app():
     def next_menu():
         return render_template("new_menu.html")
 
+    @app.route("/third_menu")
+    def third_menu():
+        return render_template("third_menu.html")
+
     return app

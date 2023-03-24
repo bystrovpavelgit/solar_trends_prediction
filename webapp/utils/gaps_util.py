@@ -12,9 +12,9 @@ from fedot.utilities.ts_gapfilling import ModelGapFiller
 def get_composite_pipeline():
     """ Returns prepared pipeline of 5 models """
     node_1 = PipelineNode("lagged")
-    node_1.parameters = {"window_size": 100}
+    node_1.parameters = {"window_size": 200}
     node_2 = PipelineNode("lagged")
-    node_2.parameters = {"window_size": 96}
+    node_2.parameters = {"window_size": 192}
     node_linear_1 = PipelineNode("linear", nodes_from=[node_1])
     node_linear_2 = PipelineNode("linear", nodes_from=[node_2])
 
@@ -27,7 +27,7 @@ def get_composite_pipeline():
 def get_simple_pipeline():
     """ Returns simple ridge regression pipeline """
     node_lagged = PipelineNode("lagged")
-    node_lagged.parameters = {"window_size": 96}
+    node_lagged.parameters = {"window_size": 192}
     node_ridge = PipelineNode("ridge", nodes_from=[node_lagged])
     ridge_pipeline = Pipeline(node_ridge)
     return ridge_pipeline

@@ -16,7 +16,7 @@
         <a class="nav-link" href="/user/logout">Выход</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/chart/input_stat">Наличие данных</a>
+        <a class="nav-link" href="/chart/input_stat">Данные</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/chart/chart">График временного ряда</a>
@@ -33,6 +33,14 @@
           </a>
           <ul class="dropdown-menu">
           {% include "nav_bar_predict.html" %}
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="/third_menu" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+            Заполнение пропусков
+          </a>
+          <ul class="dropdown-menu">
+          {% include "nav_bar_gaps.html" %}
           </ul>
         </li>
     </ul>
