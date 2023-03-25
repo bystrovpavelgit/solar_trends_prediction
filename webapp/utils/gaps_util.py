@@ -2,6 +2,7 @@
     Apache License 2.0 Copyright (c) 2022
     gaps filling utility using Fedot api
 """
+import logging
 import numpy as np
 import pandas as pd
 from fedot.core.pipelines.node import PipelineNode
@@ -35,17 +36,20 @@ def get_simple_pipeline():
 
 def fill_gaps(file_path="data/sunspot_gaps.csv"):
     """ Fill gaps in timeseries instead of -1 values. """
-    dataframe = pd.read_csv(file_path, delimiter=";")
-    dataframe["date"] = dataframe["date"].astype(float)
-    # dataframe["temperature"] = dataframe["with_gap"]
+    try:
+        dataframe = pd.read_csv(file_path, delimiter=";")
+        dataframe["date"] = dataframe["date"].astype(float)
 
-    simple_pipe = get_simple_pipeline()
-    filler1 = ModelGapFiller(gap_value=-1.0, pipeline=simple_pipe)
-    gaps = np.array(dataframe["with_gap"])
-    dataframe["ridge"] = filler1.forward_inverse_filling(gaps)
+        simple_pipe = get_simple_pipeline()
+        filler1 = ModelGapFiller(gap_value=-1.0, pipeline=simple_pipe)
+        gaps = np.array(dataframe["with_gap"])
+        dataframe["ridge"] = filler1.forward_inverse_filling(gaps)
 
-    pipeline = get_composite_pipeline()
-    filler2 = ModelGapFiller(gap_value=-1.0, pipeline=pipeline)
-    dataframe["composite"] = filler2.forward_filling(gaps)
-    return dataframe
+        pipeline = get_composite_pipeline()
+        filler2 = ModelGapFiller(gap_value=-1.0, pipeline=pipeline)
+        dataframe["composite"] = filler2.forward_filling(gaps)
+        return dataframe
+    except FileNotFoundError as exc:
+        logging.error(f"ошибка: файл не найден {file_path}")
+        raise exc
 # dataframe = fill_gaps("data/sunspot_gaps.csv")
