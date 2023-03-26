@@ -67,7 +67,7 @@ def train_lags_dnn_model(data, fields, turns=600):
     """ train dnn_model with number of epochs = turns """
     if data is None or not fields:
         raise ValueError("Empty input arguments")
-    np.random.seed(212)
+    np.random.seed(222)
     lags = fields
     model = get_two_layers_nnet()
     num = len(data["sunspots"].values)

@@ -283,9 +283,8 @@ def get_fourier_prediction(x_data: array, times: array,
 
 def get_lag_fields():
     """ get lag fields """
-    final_lag = 12
-    names = [f"lag_{num}" for num in range(1, 25)]
-    names += [f"lag_{i * 12}" for i in range(3, (final_lag + 1))]
+    names = [f"lag_{num}" for num in range(1, 27)]
+    names += [f"lag_{num}" for num in range(64, 514, 64)]
     return names
 
 
@@ -299,6 +298,9 @@ def prediction_by_type(type_: str, dataframe: DataFrame) -> tuple:
         regression = Ridge(alpha=0.2)
     elif type_ == REGRESSION_VALUES[3]:
         x_train = dataframe[get_lag_fields()].values
+        mean = x_train.mean(axis=0)
+        std = x_train.std(axis=0)
+        x_train = (x_train - mean) / std
         y_true = dataframe["sunspots"].values
         res = calculate_dnn_prediction(x_train, y_true)
         return res

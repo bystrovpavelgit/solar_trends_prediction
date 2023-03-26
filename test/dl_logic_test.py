@@ -8,7 +8,7 @@ from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
 from webapp.utils.trends_util import get_lag_fields
 from webapp.utils.dataframe_util import sunspot_numbers, prepare_data
 from webapp.dl_logic import load_rnn_model, predict_next_cycle, \
-    predict_two_cycles, train_lags_dnn_model
+    predict_two_cycles, train_lags_dnn_model, calculate_dnn_prediction
 
 
 class DLModelTest(unittest.TestCase):
@@ -79,9 +79,31 @@ class DLModelTest(unittest.TestCase):
         num = len(data["sunspots"].values)
 
         model = train_lags_dnn_model(data, lags, turns=1)
-        trend = model.predict(data[lags].values)
+        trend = model.predict(data[lags].values).reshape(-1)
 
         self.assertIsNotNone(model)
-        self.assertEquals(len(trend), num)
+        self.assertEqual(len(trend), num)
         self.assertTrue(trend[0] > 0.)
         self.assertTrue(trend[-1] > 0.)
+
+    def test_calculate_dnn_prediction_positively(self):
+        """ unit-test for calculate_dnn_prediction func """
+        data = prepare_data()
+        x_train = data[get_lag_fields()].values
+        mean = x_train.mean(axis=0)
+        std = x_train.std(axis=0)
+        x_train = (x_train - mean) / std
+        y_true = data["sunspots"].values
+
+        predicted, mae = calculate_dnn_prediction(x_train, y_true)
+
+        self.assertIsNotNone(predicted)
+        self.assertEqual(len(predicted), len(y_true))
+        self.assertTrue(mae > 10.)
+
+    def test_calculate_dnn_prediction_negatively(self):
+        """ unit-test for calculate_dnn_prediction func """
+        x_data = None
+        y_data = None
+
+        self.assertRaises(ValueError, calculate_dnn_prediction, x_data, y_data)

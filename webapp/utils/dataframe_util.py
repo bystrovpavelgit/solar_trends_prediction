@@ -145,13 +145,14 @@ def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv")\
 
 def prepare_data(csv_file="data/sunspot_numbers.csv",
                  lag_start=1,
-                 lag_end=24):
+                 lag_end=26):
     """ """
     data = pd.read_csv(csv_file, delimiter=";")
-    # lags of series
+    fields = []
     for i in range(lag_start, (lag_end + 1)):
         data[f"lag_{i}"] = data.sunspots.shift(i).fillna(0.)
-    final_lag = 12
-    for i in range(3, (final_lag + 1)):
-        data[f"lag_{i * 12}"] = data.sunspots.shift(i * 12).fillna(0.)
+        fields.append(f"lag_{i}")
+    for i in range(64, 514, 64):
+        data[f"lag_{i}"] = data.sunspots.shift(i).fillna(0.)
+        fields.append(f"lag_{i}")
     return data

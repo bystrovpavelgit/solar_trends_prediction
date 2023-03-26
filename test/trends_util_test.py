@@ -129,8 +129,8 @@ class TrendsUtilTest(unittest.TestCase):
 
         predicted, mae = prediction_by_type("Linear", data)
 
-        self.assertEqual(predicted[0], 4.311016530012111)
-        self.assertEqual(mae, 17.41632947476143)
+        self.assertEqual(predicted[0], 8.225963980612107)
+        self.assertEqual(mae, 17.399226421749635)
 
     def test_prediction_by_type_ridge(self):
         """ юнит-тест для prediction by type ridge """
@@ -138,8 +138,8 @@ class TrendsUtilTest(unittest.TestCase):
 
         predicted, mae = prediction_by_type("Ridge", data)
 
-        self.assertEqual(predicted[0], 4.312483124346727)
-        self.assertEqual(mae, 17.41649514118986)
+        self.assertEqual(predicted[0], 8.228347021413697)
+        self.assertEqual(mae, 17.3993339765839)
 
     def test_prediction_by_type_negative(self):
         """ negative юнит-тест для prediction by type """
@@ -154,8 +154,8 @@ class TrendsUtilTest(unittest.TestCase):
 
         predicted, mae = regression_prediction(reg, data)
 
-        self.assertEqual(predicted[0], 4.311016530012111)
-        self.assertEqual(mae, 17.41632947476143)
+        self.assertEqual(predicted[0], 8.225963980612107)
+        self.assertEqual(mae, 17.399226421749635)
 
     def test_regression_prediction_ridge(self):
         """ юнит-тест для regression_prediction """
@@ -164,8 +164,8 @@ class TrendsUtilTest(unittest.TestCase):
 
         prediction, mae = regression_prediction(reg, data)
 
-        self.assertEqual(prediction[0], 4.312483124346727)
-        self.assertEqual(mae, 17.41649514118986)
+        self.assertEqual(prediction[0], 8.228347021413697)
+        self.assertEqual(mae, 17.3993339765839)
 
     def test_regression_prediction_negative(self):
         """ negative юнит-тест для regression_prediction """
