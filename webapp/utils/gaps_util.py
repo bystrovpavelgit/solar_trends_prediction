@@ -52,4 +52,3 @@ def fill_gaps(file_path="data/sunspot_gaps.csv"):
     except FileNotFoundError as exc:
         logging.error(f"ошибка: файл не найден {file_path}")
         raise exc
-# dataframe = fill_gaps("data/sunspot_gaps.csv")

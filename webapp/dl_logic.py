@@ -63,8 +63,10 @@ def get_two_layers_nnet():
     return model
 
 
-def train_lags_dnn_model(data, fields):
-    """ train_lags_dnn_model """
+def train_lags_dnn_model(data, fields, turns=600):
+    """ train dnn_model with number of epochs = turns """
+    if data is None or not fields:
+        raise ValueError("Empty input arguments")
     np.random.seed(212)
     lags = fields
     model = get_two_layers_nnet()
@@ -81,12 +83,12 @@ def train_lags_dnn_model(data, fields):
     x_train = (x_train - mean) / std
     x_test = (x_test - mean) / std
 
-    model.fit(x_train, y_train, epochs=600, batch_size=64,
+    model.fit(x_train, y_train, epochs=turns, batch_size=64,
               validation_data=(x_test, y_test))
     return model
 
 
-def calculate_dnn_prediction(x_data: np.array, y_data: np.array) -> np.array:
+def calculate_dnn_prediction(x_data: np.array, y_data: np.array) -> tuple:
     """ calculate dnn prediction """
     if x_data is None or y_data is None:
         raise ValueError("Empty input arguments")

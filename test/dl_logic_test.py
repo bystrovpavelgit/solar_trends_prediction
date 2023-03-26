@@ -5,9 +5,10 @@
 import unittest
 import numpy as np
 from webapp.config import RNN_INPUT_SIZE, RNN_OUTPUT_SIZE
-from webapp.utils.dataframe_util import sunspot_numbers
+from webapp.utils.trends_util import get_lag_fields
+from webapp.utils.dataframe_util import sunspot_numbers, prepare_data
 from webapp.dl_logic import load_rnn_model, predict_next_cycle, \
-    predict_two_cycles
+    predict_two_cycles, train_lags_dnn_model
 
 
 class DLModelTest(unittest.TestCase):
@@ -56,3 +57,31 @@ class DLModelTest(unittest.TestCase):
             predict_two_cycles(dummy, dummy)
         except ValueError as err:
             self.assertIsNotNone(err)
+
+    def test_train_lags_dnn_model_negatively1(self):
+        """ negative test for train_lags_dnn_model function """
+        data = None
+
+        self.assertRaises(ValueError, train_lags_dnn_model, data, [])
+
+    def test_train_lags_dnn_model_negatively2(self):
+        """ negative test for train_lags_dnn_model function """
+        fields1 = None
+        fields2 = []
+
+        self.assertRaises(ValueError, train_lags_dnn_model, [0], fields1)
+        self.assertRaises(ValueError, train_lags_dnn_model, [0], fields2)
+
+    def test_train_lags_dnn_model_positively(self):
+        """ unit-test for train_lags_dnn_model function """
+        data = prepare_data()
+        lags = get_lag_fields()
+        num = len(data["sunspots"].values)
+
+        model = train_lags_dnn_model(data, lags, turns=1)
+        trend = model.predict(data[lags].values)
+
+        self.assertIsNotNone(model)
+        self.assertEquals(len(trend), num)
+        self.assertTrue(trend[0] > 0.)
+        self.assertTrue(trend[-1] > 0.)
