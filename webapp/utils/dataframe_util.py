@@ -34,11 +34,46 @@ def find_minimums(series: array, length: int) -> list:
     return result
 
 
-def filtered_minimums(series: array, length: int) -> list:
+def find_minimum_with_strategy(data, start, length, inc=40, index=1):
+    """ find minimum with strategy """
+    size = len(data)
+    sides = [((i * length) // 2) + start for i in range(2)] + \
+            [min(start + length + inc, size)]
+    ndx = list(np.arange(0, start + length + inc))
+    mins = [np.min(data[sides[i]: sides[i + 1]]) for i in range(2)]
+    splits = [data[sides[i]: sides[i + 1]] for i in range(2)]
+    indices = [np.where(splits[i] == mins[i],
+                        ndx[sides[i]: sides[i + 1]], -1) for i in range(2)]
+    if index == 0:
+        return list(filter(lambda x: x > -1, indices[0].tolist()))[0]
+    return list(filter(lambda x: x > -1, indices[1].tolist()))[0]
+
+
+def get_all_minimums(data, length=128):
+    """ get_all_minimums """
+    size = len(data)
+    minimums = []
+    init = 0
+    while (init + (length // 2)) < size:
+        if init == 0:
+            result0 = find_minimum_with_strategy(data, 0, length, index=0)
+            result1 = find_minimum_with_strategy(data, 0, length, index=1)
+            if data[result0] < data[result1]:
+                res = result0
+            else:
+                res = result1
+        else:
+            res = find_minimum_with_strategy(data, init, length, index=1)
+        init = res + 1
+        minimums.append(res)
+    return minimums
+
+
+def filtered_minimums(series: array, length: int = 128) -> list:
     """ find all minimums in series """
     if series is None or length is None:
         return []
-    res = find_minimums(series, length)
+    res = get_all_minimums(series, length=length)
     indices = [0] + \
               [i for i in range(1, len(res)) if (res[i] - res[i - 1]) > 63]
     result = np.array(res)[indices].tolist()
@@ -146,13 +181,17 @@ def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv")\
 def prepare_data(csv_file="data/sunspot_numbers.csv",
                  lag_start=1,
                  lag_end=26):
-    """ """
-    data = pd.read_csv(csv_file, delimiter=";")
-    fields = []
-    for i in range(lag_start, (lag_end + 1)):
-        data[f"lag_{i}"] = data.sunspots.shift(i).fillna(0.)
-        fields.append(f"lag_{i}")
-    for i in range(64, 514, 64):
-        data[f"lag_{i}"] = data.sunspots.shift(i).fillna(0.)
-        fields.append(f"lag_{i}")
+    """ prepare data """
+    try:
+        data = pd.read_csv(csv_file, delimiter=";")
+        fields = []
+        for i in range(lag_start, (lag_end + 1)):
+            data[f"lag_{i}"] = data["sunspots"].shift(i).fillna(0.)
+            fields.append(f"lag_{i}")
+        for i in range(64, 514, 64):
+            data[f"lag_{i}"] = data["sunspots"].shift(i).fillna(0.)
+            fields.append(f"lag_{i}")
+    except FileNotFoundError as exc:
+        logging.error("File data/sunspot_numbers.csv not found")
+        raise exc
     return data
