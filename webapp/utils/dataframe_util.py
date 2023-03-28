@@ -106,33 +106,37 @@ def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv") \
        enrich dataframe with 1y, 3y and 128 months moving averages and
        with min, max and average number of sunspots
     """
-    data = pd.read_csv(csv_file, delimiter=";")
-    trend = data["sunspots"].values
-    # calculate moving average
-    data["mean_1y"] = rolling_mean(data["sunspots"], 12)
-    data["mean_3y"] = rolling_mean(data["sunspots"], 36)
-    data["mean_12y"] = rolling_mean(data["sunspots"], 128)
-    # fill the first value of 96.7 instead of NA
-    data["mean_1y"] = data["mean_1y"].fillna(96.7)
-    data["mean_3y"] = data["mean_3y"].fillna(96.7)
-    data["mean_12y"] = data["mean_12y"].fillna(96.7)
-    # find minimums in trend using period = 128 months
-    ndxes = [0] + get_all_minimums(trend) + [len(trend)]
-    # calculate min, max and average number of sunspots for solar cycles
-    min_ = fill_values(trend, ndxes, np.min)
-    max_ = fill_values(trend, ndxes, np.max)
-    avg = fill_values(trend, ndxes, np.mean)
-    data["sn_mean"] = pd.Series(avg.tolist())
-    data["sn_max"] = pd.Series(max_.tolist())
-    data["sn_min"] = pd.Series(min_.tolist())
-    y_max = hstack([np.zeros([ndxes[17]]),
-                    np.ones((ndxes[20] - ndxes[17])),
-                    np.zeros([ndxes[-1] - ndxes[20]])])
-    y_min = hstack([np.zeros([ndxes[5]]),
-                    np.ones((ndxes[8] - ndxes[5])),
-                    np.zeros([ndxes[-1] - ndxes[8]])])
-    data["y_min"] = pd.Series(y_min.tolist())
-    data["y_max"] = pd.Series(y_max.tolist())
+    try:
+        data = pd.read_csv(csv_file, delimiter=";")
+        trend = data["sunspots"].values
+        # calculate moving average
+        data["mean_1y"] = rolling_mean(data["sunspots"], 12)
+        data["mean_3y"] = rolling_mean(data["sunspots"], 36)
+        data["mean_12y"] = rolling_mean(data["sunspots"], 128)
+        # fill the first value of 96.7 instead of NA
+        data["mean_1y"] = data["mean_1y"].fillna(96.7)
+        data["mean_3y"] = data["mean_3y"].fillna(96.7)
+        data["mean_12y"] = data["mean_12y"].fillna(96.7)
+        # find minimums in trend using period = 128 months
+        ndxes = [0] + get_all_minimums(trend) + [len(trend)]
+        # calculate min, max and average number of sunspots for solar cycles
+        min_ = fill_values(trend, ndxes, np.min)
+        max_ = fill_values(trend, ndxes, np.max)
+        avg = fill_values(trend, ndxes, np.mean)
+        data["sn_mean"] = pd.Series(avg.tolist())
+        data["sn_max"] = pd.Series(max_.tolist())
+        data["sn_min"] = pd.Series(min_.tolist())
+        y_max = hstack([np.zeros([ndxes[17]]),
+                        np.ones((ndxes[20] - ndxes[17])),
+                        np.zeros([ndxes[-1] - ndxes[20]])])
+        y_min = hstack([np.zeros([ndxes[5]]),
+                        np.ones((ndxes[8] - ndxes[5])),
+                        np.zeros([ndxes[-1] - ndxes[8]])])
+        data["y_min"] = pd.Series(y_min.tolist())
+        data["y_max"] = pd.Series(y_max.tolist())
+    except FileNotFoundError as exc:
+        logging.error("File data/sunspot_numbers.csv not found")
+        raise exc
     return data
 
 

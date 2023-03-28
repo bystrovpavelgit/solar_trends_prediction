@@ -33,12 +33,12 @@ def gaps_stat():
     return render_template("gaps/input_statistics.html", y=arr)
 
 
-@blueprint.route("/fill")
+@blueprint.route("/mean")
 def fill():
     """ fill function """
-    data = get_enriched_dataframe()
-    lst = get_all_minimums(data["mean_1y"], 128)
+    data = get_enriched_dataframe().get()
+    lst = get_all_minimums(data["sunspots"].values, 128)
     subs = [lst[i] - lst[i - 1] for i in range(1, len(lst))]
-    print(subs)
+    print("=============", subs)
     print(np.std(subs), np.mean(subs))
     return render_template("index.html")
