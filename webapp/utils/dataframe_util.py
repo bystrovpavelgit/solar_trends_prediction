@@ -10,79 +10,65 @@ from pandas import Series
 from optional import Optional
 
 
-def min_index(series: array, start: int, interval: int) -> int:
-    """ find min index """
-    index = -1
-    if len(series) == 0:
-        return index
-    min_ = np.max(series) + 1.
-    for j in range(start, min(start + interval, len(series))):
-        if series[j] < min_:
-            index = j
-            min_ = series[j]
-    return index
-
-
-def find_minimums(series: array, length: int) -> list:
-    """ find all minimums in series """
-    if length <= 0:
-        return []
-    k = len(series) // length
-    if len(series) > k * length:
-        k += 1
-    result = [min_index(series, i * length, length) for i in range(k)]
+def find_minimum_with_strategy(data: array, start: int, length: int,
+                               inc: int = 40, strategy: int = 1) -> int:
+    """
+       find minimums using provided strategy
+       :attr:`strategy` = 0 - check the first half for minimum
+       :attr:`strategy` = 1 - check the second half for minimum
+    """
+    if data is None:
+        raise ValueError("Input array is empty")
+    if len(data) < start or len(data) < length:
+        raise ValueError("Input array is too short")
+    size = len(data)
+    # intervals
+    intv = [((i * length) // 2) + start for i in range(2)] + \
+           [min(start + length + inc, size)]
+    # indices from data array
+    ndx = list(np.arange(0, start + length + inc))
+    # minimums
+    minimums = [np.min(data[intv[i]: intv[i + 1]]) for i in range(2)]
+    # data from the first half and from the second half
+    splits = [data[intv[i]: intv[i + 1]] for i in range(2)]
+    # indices of minimums from splits (-1 placed for non minimums)
+    min_indices = [np.where(splits[i] == minimums[i],
+                            ndx[intv[i]: intv[i + 1]], -1) for i in range(2)]
+    if strategy == 0:
+        result = int(list(filter(lambda x: x > -1,
+                                 min_indices[0].tolist()))[0])
+        return result
+    result = int(list(filter(lambda x: x > -1, min_indices[1].tolist()))[0])
     return result
 
 
-def find_minimum_with_strategy(data, start, length, inc=40, index=1):
-    """ find minimum with strategy """
-    size = len(data)
-    sides = [((i * length) // 2) + start for i in range(2)] + \
-            [min(start + length + inc, size)]
-    ndx = list(np.arange(0, start + length + inc))
-    mins = [np.min(data[sides[i]: sides[i + 1]]) for i in range(2)]
-    splits = [data[sides[i]: sides[i + 1]] for i in range(2)]
-    indices = [np.where(splits[i] == mins[i],
-                        ndx[sides[i]: sides[i + 1]], -1) for i in range(2)]
-    if index == 0:
-        return list(filter(lambda x: x > -1, indices[0].tolist()))[0]
-    return list(filter(lambda x: x > -1, indices[1].tolist()))[0]
-
-
-def get_all_minimums(data, length=128):
-    """ get_all_minimums """
+def get_all_minimums(data: array, length: int = 128) -> list:
+    """ find all minimums in data """
+    if data is None or len(data) == 0:
+        return []
+    if length <= 0 or len(data) < length:
+        return []
     size = len(data)
     minimums = []
     init = 0
     while (init + (length // 2)) < size:
         if init == 0:
-            result0 = find_minimum_with_strategy(data, 0, length, index=0)
-            result1 = find_minimum_with_strategy(data, 0, length, index=1)
+            result0 = find_minimum_with_strategy(data, 0, length, strategy=0)
+            result1 = find_minimum_with_strategy(data, 0, length, strategy=1)
             if data[result0] < data[result1]:
                 res = result0
             else:
                 res = result1
         else:
-            res = find_minimum_with_strategy(data, init, length, index=1)
+            res = find_minimum_with_strategy(data, init, length, strategy=1)
         init = res + 1
         minimums.append(res)
     return minimums
 
 
-def filtered_minimums(series: array, length: int = 128) -> list:
-    """ find all minimums in series """
-    if series is None or length is None:
-        return []
-    res = get_all_minimums(series, length=length)
-    indices = [0] + \
-              [i for i in range(1, len(res)) if (res[i] - res[i - 1]) > 63]
-    result = np.array(res)[indices].tolist()
-    return result
-
-
 def rolling_mean(series: Series, num: int) -> Series:
     """
-        Calculate average of last n observations
+        Calculate average of last nun observations
     """
     mean_window_n = series.rolling(window=num).mean()
     return mean_window_n
@@ -102,7 +88,7 @@ def fill_values(data, ndx, func):
 
 
 def sunspot_numbers(csv_file: str = "data/sunspot_numbers.csv") -> Optional:
-    """ returns sunspot numbers data """
+    """ returns sunspot numbers data from csv-file if file exists"""
     try:
         data = pd.read_csv(csv_file, delimiter=";")
         year_float = data["year_float"].values
@@ -114,25 +100,7 @@ def sunspot_numbers(csv_file: str = "data/sunspot_numbers.csv") -> Optional:
         return Optional.empty()
 
 
-def get_users_timeseries(csv_file: str = "data/hour_online.csv") -> Optional:
-    """
-       enrich users timeseries with 12 points moving average,
-       36 points moving averages and 128 points moving average
-    """
-    try:
-        times = pd.read_csv(csv_file)
-        # fill the first value of 34002 instead of NA
-        times["mean_12p"] = rolling_mean(times["Users"], 12).fillna(34002)
-        times["mean_36p"] = rolling_mean(times["Users"], 36).fillna(34002)
-        times["mean_128p"] = rolling_mean(times["Users"], 128).fillna(34002)
-        return Optional.of(times)
-    except FileNotFoundError:
-        message = f"File not found {csv_file}"
-        logging.error(message)
-        return Optional.empty()
-
-
-def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv")\
+def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv") \
         -> pd.DataFrame:
     """
        enrich dataframe with 1y, 3y and 128 months moving averages and
@@ -149,30 +117,20 @@ def get_enriched_dataframe(csv_file: str = "data/sunspot_numbers.csv")\
     data["mean_3y"] = data["mean_3y"].fillna(96.7)
     data["mean_12y"] = data["mean_12y"].fillna(96.7)
     # find minimums in trend using period = 128 months
-    mins = find_minimums(trend, 128)
-    # correction for short cycle after minimum #7 using period = 119 months
-    correction = find_minimums(trend[mins[7]:(mins[7] + 120)], 119)
-    # next cycle after minimum #7
-    cy8 = mins[7] + correction[1]
-    # correction for many zeroes at the end of minimum #5
-    cy6 = (mins[5] + mins[6]) // 2
-    # drop invalid minimums 6 and 9
-    indices = [0] + mins[:5] + [cy6, mins[7], cy8, mins[8]] + mins[10:] + \
-              [len(trend)]
+    ndxes = [0] + get_all_minimums(trend) + [len(trend)]
     # calculate min, max and average number of sunspots for solar cycles
-    min_ = fill_values(trend, indices, np.min)
-    max_ = fill_values(trend, indices, np.max)
-    avg = fill_values(trend, indices, np.mean)
+    min_ = fill_values(trend, ndxes, np.min)
+    max_ = fill_values(trend, ndxes, np.max)
+    avg = fill_values(trend, ndxes, np.mean)
     data["sn_mean"] = pd.Series(avg.tolist())
     data["sn_max"] = pd.Series(max_.tolist())
     data["sn_min"] = pd.Series(min_.tolist())
-
-    y_max = hstack([np.zeros([indices[17]]),
-                    np.ones((indices[20] - indices[17])),
-                    np.zeros([indices[-1] - indices[20]])])
-    y_min = hstack([np.zeros([indices[5]]),
-                    np.ones((indices[8] - indices[5])),
-                    np.zeros([indices[-1] - indices[8]])])
+    y_max = hstack([np.zeros([ndxes[17]]),
+                    np.ones((ndxes[20] - ndxes[17])),
+                    np.zeros([ndxes[-1] - ndxes[20]])])
+    y_min = hstack([np.zeros([ndxes[5]]),
+                    np.ones((ndxes[8] - ndxes[5])),
+                    np.zeros([ndxes[-1] - ndxes[8]])])
     data["y_min"] = pd.Series(y_min.tolist())
     data["y_max"] = pd.Series(y_max.tolist())
     return data

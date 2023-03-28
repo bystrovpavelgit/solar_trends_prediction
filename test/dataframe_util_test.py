@@ -6,8 +6,8 @@ import unittest
 import numpy as np
 import pandas as pd
 from webapp.utils.dataframe_util import fill_values, rolling_mean, \
-    get_enriched_dataframe, get_users_timeseries, sunspot_numbers, \
-    find_minimums, min_index
+    get_enriched_dataframe, sunspot_numbers, \
+    get_all_minimums, find_minimum_with_strategy
 
 
 class DataframeUtilTest(unittest.TestCase):
@@ -107,73 +107,64 @@ class DataframeUtilTest(unittest.TestCase):
         self.assertEqual(stat[5], 4., "равен 4")
         self.assertEqual(stat[6], 5., "равен 5")
 
-    def test_min_index_positively(self):
+    def test_min_index_positively1(self):
         """ позитивный юнит-тест для min_index """
         arr = np.array([2, 3, 5, 5, 3, 1, 2])
 
-        index = min_index(arr, 0, 6)
+        index = find_minimum_with_strategy(arr, 0, 6, strategy=1)
 
         self.assertEqual(index, 5, "min_index = 5")
+
+    def test_min_index_positively2(self):
+        """ позитивный юнит-тест для min_index """
+        arr = np.array([2, 3, 6, 5, 3, 1, 9])
+
+        index = find_minimum_with_strategy(arr, 0, 6, strategy=0)
+
+        self.assertEqual(index, 0, "min_index = 0")
 
     def test_min_index_negatively(self):
         """ негативный юнит-тест для min_index """
         empty = np.array([])
 
-        index = min_index(empty, 0, 9)
+        self.assertRaises(ValueError, find_minimum_with_strategy, empty, 0, 9)
 
-        self.assertEqual(index, -1, "min_index равен -1")
-
-    def test_find_minimums_positively(self):
+    def test_get_all_minimums_positively(self):
         """ негативный юнит-тест для find_minimums """
         inp = np.array([2, 3, 5, 5, 3, 1, 2])
 
-        arr = find_minimums(inp, 7)
+        arr = get_all_minimums(inp, 7)
 
         self.assertEqual(arr, [5], "minimums равен [5]")
 
-    def test_find_minimums_negatively1(self):
+    def test_get_all_minimums_negatively1(self):
         """ негативный юнит-тест для find_minimums """
         empty = np.array([])
 
-        arr = find_minimums(empty, 9)
+        arr = get_all_minimums(empty, 9)
 
         self.assertEqual(arr, [], "minimums = []")
 
-    def test_find_minimums_negatively2(self):
+    def test_get_all_minimums_negatively2(self):
         """ негативный юнит-тест для find_minimums """
-        empty = np.array([2, 3, 5])
+        empty = None
 
-        arr = find_minimums(empty, -1)
+        arr = get_all_minimums(empty, 5)
 
         self.assertEqual(arr, [], "minimums = []")
 
-    def test_find_minimums_negatively3(self):
+    def test_get_all_minimums_negatively3(self):
         """ негативный юнит-тест для find_minimums """
-        empty = np.array([2, 3, 5])
+        arr = np.array([2, 3, 5])
 
-        arr = find_minimums(empty, 0)
+        arr = get_all_minimums(arr, -1)
 
         self.assertEqual(arr, [], "minimums = []")
 
-    def test_get_users_timeseries_negatively(self):
-        """ test get_users_timeseries """
-        csv = "data/none.csv"
+    def test_get_all_minimums_negatively4(self):
+        """ негативный юнит-тест для find_minimums """
+        arr = np.array([2, 3, 5])
 
-        data = get_users_timeseries(csv_file=csv)
+        arr = get_all_minimums(arr, 0)
 
-        self.assertIsNotNone(data)
-        self.assertTrue(data.is_empty())
-
-    def test_get_users_timeseries_positively(self):
-        """ test get_users_timeseries """
-        csv = "data/hour_online.csv"
-
-        opt_res = get_users_timeseries(csv_file=csv)
-        data = opt_res.get()
-
-        self.assertIsNotNone(opt_res)
-        self.assertFalse(opt_res.is_empty())
-        self.assertTrue("mean_12p" in data.columns)
-        self.assertTrue("mean_36p" in data.columns)
-        self.assertTrue("mean_128p" in data.columns)
-        self.assertTrue('Users' in data.columns)
+        self.assertEqual(arr, [], "minimums = []")

@@ -43,9 +43,12 @@ def process_smoothing():
 def best_model():
     """ display results for best ML model """
     info = {'graph': 'Adaboost classifier predictions for max and min'}
+    data = get_enriched_dataframe()
     time, pmax, pmin, max_, sunspots = get_results_for_best_classifier()
     period = len(time)
     timeseries = time[:period].tolist()
+    pmin = data["y_min"].values
+    pmax = data["y_max"].values
     return render_template("stat/best.html",
                            info=info,
                            time=timeseries,

@@ -93,16 +93,14 @@ def get_results_for_best_classifier():
     results = (ExtraTreesClassifier(), {})
     classifiers = get_classifiers_and_params()
     for clf, parameters in classifiers:
-        try:
-            score, best_params = predict_using_cross_validation(clf,
-                                                                parameters,
-                                                                data_scaled,
-                                                                dframe)
-            if max_score < score:
-                max_score = score
-                results = (clf, best_params)
-        except ValueError:
-            print("Wrong parameters for predict_using_cross_validation")
+        score, best_params = predict_using_cross_validation(clf,
+                                                            parameters,
+                                                            data_scaled,
+                                                            dframe)
+        if max_score < score:
+            max_score = score
+            results = (clf, best_params)
+
     print(f"best model {str(results[0].__class__)} ")
     predict_max, predict_min, max_, sunspots = evaluate_classifier(results[0],
                                                                    results[1],

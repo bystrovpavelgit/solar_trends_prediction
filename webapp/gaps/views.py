@@ -5,7 +5,7 @@
 import numpy as np
 from flask import Blueprint, render_template
 from webapp.gaps.api import count_gaps
-from webapp.utils.dataframe_util import filtered_minimums, \
+from webapp.utils.dataframe_util import get_all_minimums, \
     get_enriched_dataframe
 from webapp.utils.gaps_util import fill_gaps
 
@@ -37,7 +37,7 @@ def gaps_stat():
 def fill():
     """ fill function """
     data = get_enriched_dataframe()
-    lst = filtered_minimums(data["mean_1y"], 128)
+    lst = get_all_minimums(data["mean_1y"], 128)
     subs = [lst[i] - lst[i - 1] for i in range(1, len(lst))]
     print(subs)
     print(np.std(subs), np.mean(subs))
