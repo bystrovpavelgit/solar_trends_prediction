@@ -1,0 +1,22 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:800px;max-height:800px"></div>
+
+<script>
+var x = {{ y }};
+var data = [{
+  x: x,
+  type: 'histogram',
+  color: 'green'
+}];
+var layout = {
+  title: "Solar cycle durations for the last 274 years"
+};
+var config = {responsive: true};
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout, config);
+
+</script>
+
+{% endblock %}
