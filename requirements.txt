@@ -1,5 +1,7 @@
 unittest
 numpy
+matplotlib
+statsmodels
 plotly
 Flask
 Flask-WTF
