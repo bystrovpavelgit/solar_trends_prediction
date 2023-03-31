@@ -10,11 +10,12 @@ from webapp.stat.views import blueprint as stat_blueprint
 from webapp.user.views import blueprint as user_blueprint
 from webapp.chart.views import blueprint as chart_blueprint
 from webapp.gaps.views import blueprint as gaps_blueprint
+from webapp.utils.plot_util import prepare_autocorr_data
 
 
 def create_app():
     """ create app """
-    app = Flask(__name__, static_url_path="/", static_folder="/")
+    app = Flask(__name__, static_url_path="/webapp/static")
     app.config.from_pyfile("config.py")
     login_mgr = LoginManager()
     login_mgr.init_app(app)
@@ -41,5 +42,12 @@ def create_app():
     @app.route("/third_menu")
     def third_menu():
         return render_template("third_menu.html")
+
+    @app.route("/autocorrelation")
+    def auto_correlation():
+        """ auto correlation graph """
+        filename = prepare_autocorr_data()
+        return render_template("gaps/show_autocorrelation.html",
+                               main_img=filename)
 
     return app
