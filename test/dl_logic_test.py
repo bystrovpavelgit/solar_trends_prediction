@@ -45,18 +45,14 @@ class DLModelTest(unittest.TestCase):
     def test_predict_next_cycle_negatively(self):
         """ negative test for predict_next_cycle function """
         dummy = np.zeros(10)
-        try:
-            predict_next_cycle(dummy, dummy)
-        except ValueError as err:
-            self.assertIsNotNone(err)
+
+        self.assertRaises(ValueError, predict_next_cycle, dummy, dummy)
 
     def test_predict_two_cycles_negatively(self):
         """ negative test for predict_two_cycles function """
         dummy = np.zeros(20)
-        try:
-            predict_two_cycles(dummy, dummy)
-        except ValueError as err:
-            self.assertIsNotNone(err)
+
+        self.assertRaises(ValueError, predict_two_cycles, dummy, dummy)
 
     def test_train_lags_dnn_model_negatively1(self):
         """ negative test for train_lags_dnn_model function """

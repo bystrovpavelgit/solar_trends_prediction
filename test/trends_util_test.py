@@ -15,10 +15,6 @@ from webapp.utils.trends_util import prediction_by_type, get_optimal_params, \
 class TrendsUtilTest(unittest.TestCase):
     """ Trends Util test """
 
-    def test_sum(self):
-        """ summation юнит-тест """
-        self.assertEqual(sum([3, 2]), 5, "равен 5")
-
     def test_exponential_smoothing(self):
         """ exponential_smoothing юнит-тест """
         date = [4, 6, 4, 6, 4, 6]

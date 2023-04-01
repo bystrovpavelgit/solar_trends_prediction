@@ -12,10 +12,7 @@ def count_gaps(data: Series, gap_marker: float = -1.0) -> int:
     """ count gaps in data """
     if data is None:
         raise ValueError("data value is empty")
-    cnt = 0
-    for val in data.values:
-        if val == gap_marker:
-            cnt += 1
+    cnt = len([val for val in data.values if val == gap_marker])
     return cnt
 
 

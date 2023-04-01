@@ -78,10 +78,7 @@ class DataframeUtilTest(unittest.TestCase):
         """
         csv = "none.csv"
 
-        try:
-            get_enriched_dataframe(csv_file=csv)
-        except FileNotFoundError as err:
-            self.assertEqual(err.strerror, "No such file or directory")
+        self.assertRaises(FileNotFoundError, get_enriched_dataframe, csv_file=csv)
 
     def test_sunspot_numbers(self):
         """ test sunspot_numbers """
