@@ -2,12 +2,9 @@
     Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
     views to display gaps in the data
 """
-import numpy as np
-from scipy import stats
 from flask import Blueprint, render_template
-from webapp.gaps.api import count_gaps
-from webapp.utils.dataframe_util import get_all_minimums, \
-    get_enriched_dataframe
+from webapp.gaps.api import count_gaps, describe_sunspots_intervals
+from webapp.utils.dataframe_util import get_enriched_dataframe
 from webapp.utils.gaps_util import fill_gaps
 
 
@@ -38,25 +35,10 @@ def gaps_stat():
 def solar_cycles():
     """ draw distribution plot with solar cycle durations """
     data = get_enriched_dataframe()
-    lst = get_all_minimums(data["sunspots"].values, 128)
-    cycles = [lst[i] - lst[i - 1] for i in range(1, len(lst))]
-    num = len(cycles)
-    cycles = np.array(sorted(cycles))
-    std = cycles.std() / 12
-    x_mean = cycles.mean() / 12
-    print(std, x_mean)
-    print("min / max:", np.min(cycles) / 12, np.max(cycles) / 12)
-    # interval using normal distribution
-    z_a = stats.t.ppf(0.997, num - 1)  # alpha = 0.006
-    x_intv = std * z_a / np.sqrt(num)
-    print(f"Student interval [{x_mean - x_intv}, {x_mean + x_intv}]")
-    # interval using normal distribution
-    z_a = stats.norm.ppf(0.997)  # alpha = 0.006
-    x_intv = std * z_a / np.sqrt(num)
-    print(f"Norm interval [{x_mean - x_intv}, {x_mean + x_intv}]")
-    # min amount
-    z_a = stats.norm.ppf(0.995)
-    num = ((z_a * 1.4 / 1.1) ** 2)
-    num = int(num + 0.9)  # top
-    print(f"min N for sigma = 1.4, alpha = 0.01 and interval = 1.1 is {num}")
-    return render_template("gaps/dist_plot.html", y=cycles.tolist())
+    series = data["sunspots"].values
+    cycles, mean_msg, msg2, msg3 = describe_sunspots_intervals(series)
+    return render_template("gaps/dist_plot.html",
+                           y=cycles.tolist(),
+                           msg=mean_msg,
+                           msg2=msg2,
+                           msg3=msg3)

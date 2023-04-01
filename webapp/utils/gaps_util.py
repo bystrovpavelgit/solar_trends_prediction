@@ -1,5 +1,5 @@
 """
-    Apache License 2.0 Copyright (c) 2022
+    Apache License 2.0 Copyright (c) 2023
     gaps filling utility using Fedot api
 """
 import logging

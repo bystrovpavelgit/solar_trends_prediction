@@ -1,12 +1,14 @@
-""" plot util """
+"""
+    Apache License 2.0 Copyright (c) 2023 Pavel Bystrov
+    plot utility
+"""
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
 import statsmodels.api as sm
 import statsmodels.tsa.api as smt
+from matplotlib import pyplot as plt
 from webapp.utils.dataframe_util import get_enriched_dataframe
-from sklearn.preprocessing import StandardScaler
 
 
 def random_uuid():
@@ -53,26 +55,24 @@ def prepare_autocorr_data():
     return filename
 
 
-scaler = StandardScaler()
-
-
-def timeseries_train_test_split(X, y, test_size):
+def timeseries_train_test_split(x, y, test_size):
     """ timeseries train test split """
     # get the index after which test set starts
-    test_index = int(len(X) * (1 - test_size))
-    X_train = X.iloc[:test_index]
+    test_index = int(len(x) * (1 - test_size))
+    x_train = x.iloc[:test_index]
     y_train = y.iloc[:test_index]
-    X_test = X.iloc[test_index:]
+    x_test = x.iloc[test_index:]
     y_test = y.iloc[test_index:]
-    return X_train, X_test, y_train, y_test
+    return x_train, x_test, y_train, y_test
 
 
 def plot_coefficients(model, x_train):
     """ plot Coefficients """
-    coefs = pd.DataFrame(model.coef_, X_train.columns)
+    coefs = pd.DataFrame(model.coef_, x_train.columns)
     coefs.columns = ["coef"]
     coefs["abs"] = coefs.coef.apply(np.abs)
     coefs = coefs.sort_values(by="abs", ascending=False).drop(["abs"], axis=1)
+    return coefs
 
 
 def code_mean(data, cat_feature, real_feature):
@@ -81,7 +81,7 @@ def code_mean(data, cat_feature, real_feature):
 
 
 def prepare_data(series, lag_start, lag_end, test_size, target_encoding=False):
-    """ """
+    """ prepare data """
     # copy of the initial dataset
     data = pd.DataFrame(series.copy())
     data.columns = ["y"]
@@ -106,18 +106,16 @@ def prepare_data(series, lag_start, lag_end, test_size, target_encoding=False):
         data.drop(["hour", "weekday"], axis=1, inplace=True)
     # train-test split
     y = data.dropna().y
-    X = data.dropna().drop(["y"], axis=1)
-    X_train, X_test, y_train, y_test = timeseries_train_test_split(
-        X, y, test_size=test_size)
-    return X_train, X_test, y_train, y_test
+    x = data.dropna().drop(["y"], axis=1)
+    x_train, x_test, y_train, y_test = timeseries_train_test_split(
+        x, y, test_size=test_size)
+    return x_train, x_test, y_train, y_test
 
 
 def plot_heatmap(ads):
     """ plot heatmap """
-    X_train, X_test, y_train, y_test = prepare_data(
+    x_train, _, __, ___ = prepare_data(
         ads.Ads, lag_start=6, lag_end=25, test_size=0.3, target_encoding=False
     )
-    x_train_scaled = scaler.fit_transform(X_train)
-    x_test_scaled = scaler.transform(X_test)
     plt.figure(figsize=(10, 8))
-    sns.heatmap(X_train.corr())
+    sns.heatmap(x_train.corr())
