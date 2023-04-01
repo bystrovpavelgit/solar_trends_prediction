@@ -10,6 +10,8 @@ from webapp.utils.dataframe_util import get_all_minimums
 
 def count_gaps(data: Series, gap_marker: float = -1.0) -> int:
     """ count gaps in data """
+    if data is None:
+        raise ValueError("data value is empty")
     cnt = 0
     for val in data.values:
         if val == gap_marker:
@@ -28,6 +30,8 @@ def confidence_interval(std, alpha, num):
 
 def describe_sunspots_intervals(data: np.array) -> tuple:
     """ describe solar intervals using t-statistics """
+    if data is None or len(data) == 0:
+        raise ValueError("data value is empty")
     lst = get_all_minimums(data, 128)
     cycles = [lst[i] - lst[i - 1] for i in range(1, len(lst))]
     num = len(cycles)
