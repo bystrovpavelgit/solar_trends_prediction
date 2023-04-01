@@ -1,5 +1,5 @@
 """
-    Apache License 2.0 Copyright (c) 2023 Pavel Bystrov
+    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
     init py
 """
 from flask import Flask, render_template
@@ -10,7 +10,8 @@ from webapp.stat.views import blueprint as stat_blueprint
 from webapp.user.views import blueprint as user_blueprint
 from webapp.chart.views import blueprint as chart_blueprint
 from webapp.gaps.views import blueprint as gaps_blueprint
-from webapp.utils.plot_util import prepare_autocorr_data
+from webapp.utils.plot_util import prepare_autocorr_data, \
+    plot_lags_correlation_heatmap
 
 
 def create_app():
@@ -48,6 +49,13 @@ def create_app():
         """ auto correlation graph """
         filename = prepare_autocorr_data()
         return render_template("gaps/show_autocorrelation.html",
+                               main_img=filename)
+
+    @app.route("/heatmap")
+    def lags_heatmap():
+        """ show lags heatmap """
+        filename = plot_lags_correlation_heatmap()
+        return render_template("gaps/show_heatmap.html",
                                main_img=filename)
 
     return app

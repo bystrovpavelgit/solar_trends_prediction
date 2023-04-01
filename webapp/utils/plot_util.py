@@ -3,12 +3,14 @@
     plot utility
 """
 import numpy as np
+import os
 import pandas as pd
 import seaborn as sns
 import statsmodels.api as sm
 import statsmodels.tsa.api as smt
 from matplotlib import pyplot as plt
-from webapp.utils.dataframe_util import get_enriched_dataframe
+from webapp.utils.dataframe_util import get_enriched_dataframe, \
+    prepare_data
 
 
 def random_uuid():
@@ -55,67 +57,19 @@ def prepare_autocorr_data():
     return filename
 
 
-def timeseries_train_test_split(x, y, test_size):
-    """ timeseries train test split """
-    # get the index after which test set starts
-    test_index = int(len(x) * (1 - test_size))
-    x_train = x.iloc[:test_index]
-    y_train = y.iloc[:test_index]
-    x_test = x.iloc[test_index:]
-    y_test = y.iloc[test_index:]
-    return x_train, x_test, y_train, y_test
+def get_lag_fields():
+    """ get lag fields """
+    names = [f"lag_{num}" for num in range(1, 27)]
+    names += [f"lag_{num}" for num in range(64, 514, 64)]
+    return names
 
 
-def plot_coefficients(model, x_train):
-    """ plot Coefficients """
-    coefs = pd.DataFrame(model.coef_, x_train.columns)
-    coefs.columns = ["coef"]
-    coefs["abs"] = coefs.coef.apply(np.abs)
-    coefs = coefs.sort_values(by="abs", ascending=False).drop(["abs"], axis=1)
-    return coefs
-
-
-def code_mean(data, cat_feature, real_feature):
-    """ code mean """
-    return dict(data.groupby(cat_feature)[real_feature].mean())
-
-
-def prepare_data(series, lag_start, lag_end, test_size, target_encoding=False):
-    """ prepare data """
-    # copy of the initial dataset
-    data = pd.DataFrame(series.copy())
-    data.columns = ["y"]
-    # lags of series
-    for i in range(lag_start, lag_end):
-        data["lag_{}".format(i)] = data.y.shift(i)
-    # datetime features
-    data.index = pd.to_datetime(data.index)
-    data["hour"] = data.index.hour
-    data["weekday"] = data.index.weekday
-    data["is_weekend"] = data.weekday.isin([5, 6]) * 1
-    if target_encoding:
-        # calculate averages on train set only
-        test_index = int(len(data.dropna()) * (1 - test_size))
-        data["weekday_average"] = list(
-            map(code_mean(data[:test_index], "weekday", "y").get, data.weekday)
-        )
-        data["hour_average"] = list(
-            map(code_mean(data[:test_index], "hour", "y").get, data.hour)
-        )
-        # drop encoded variables
-        data.drop(["hour", "weekday"], axis=1, inplace=True)
-    # train-test split
-    y = data.dropna().y
-    x = data.dropna().drop(["y"], axis=1)
-    x_train, x_test, y_train, y_test = timeseries_train_test_split(
-        x, y, test_size=test_size)
-    return x_train, x_test, y_train, y_test
-
-
-def plot_heatmap(ads):
+def plot_lags_correlation_heatmap() -> str:
     """ plot heatmap """
-    x_train, _, __, ___ = prepare_data(
-        ads.Ads, lag_start=6, lag_end=25, test_size=0.3, target_encoding=False
-    )
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(x_train.corr())
+    dataframe = prepare_data()
+    correlations = dataframe[get_lag_fields()].corr()
+    os.makedirs("webapp/static", exist_ok=True)
+    uuid = random_uuid()
+    file_name = os.path.join("webapp", "static", f"heatmap_{uuid}.jpg")
+    sns.heatmap(correlations).get_figure().savefig(file_name)
+    return file_name

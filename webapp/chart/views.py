@@ -1,5 +1,5 @@
 """
-    Apache License 2.0 Copyright (c) 2022 Pavel Bystrov
+    Apache License 2.0 Copyright (c) 2023 Pavel Bystrov
     chart views
 """
 import logging
