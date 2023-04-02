@@ -47,7 +47,7 @@ def create_app():
     @app.route("/autocorrelation")
     def auto_correlation():
         """ auto correlation graph """
-        filename = prepare_autocorr_data()
+        filename, pval = prepare_autocorr_data()
         return render_template("gaps/show_autocorrelation.html",
                                main_img=filename)
 

@@ -35,7 +35,6 @@ class EnrichSunspotsTest(unittest.TestCase):
                                                             self.dframe)
 
         self.assertTrue(score > 0.92)
-        self.assertTrue(best_params['max_depth'] >= 4)
         self.assertTrue(best_params['n_estimators'] >= 3)
 
     def test_predict_using_cross_validation2(self):

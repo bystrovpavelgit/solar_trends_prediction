@@ -2,6 +2,7 @@
     Apache License 2.0 Copyright (c) 2023 Pavel Bystrov
     plot utility
 """
+import logging
 import numpy as np
 import os
 import pandas as pd
@@ -24,16 +25,14 @@ def autocorr_image(y, lags=200, figsize=(11, 5), style="bmh"):
         Plot auto-correlation figure and partial auto-correlation figure,
         calculate Dickey–Fuller test
     """
-
-    if not isinstance(y, pd.Series):
-        y = pd.Series(y)
+    if y is None:
+        raise ValueError("Input timeseries are empty")
 
     uuid = random_uuid()
+    file_name = os.path.join("webapp", "static", f"auto_corr_{uuid}.jpg")
     with plt.style.context(style):
         plt.figure(figsize=figsize)
         layout = (2, 1)
-        # ts_ax = plt.subplot2grid(layout, (0, 0), colspan=2)
-        # ts_ax.plot(y)
         acf_ax = plt.subplot2grid(layout, (0, 0))
         pacf_ax = plt.subplot2grid(layout, (1, 0))
 
@@ -42,18 +41,23 @@ def autocorr_image(y, lags=200, figsize=(11, 5), style="bmh"):
             "Time Series Analysis\n Dickey-Fuller: p={0:.5f}".format(p_value)
         )
         smt.graphics.plot_acf(y, lags=lags, ax=acf_ax)
-        smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)
+        smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)  # LinAlgError
         plt.tight_layout()
-        file_name = f"webapp/static/auto_corr_{uuid}.jpg"
-        plt.savefig(file_name)
-    return file_name
+        try:
+            os.makedirs("webapp/static", exist_ok=True)
+            plt.savefig(file_name)
+        except FileNotFoundError as exc:
+            # numpy.linalg.LinAlgError: Singular matrix
+            msg = f"Directory for file {file_name} not exists"
+            logging.error(msg)
+            raise exc
+    return file_name, p_value
 
 
 def prepare_autocorr_data():
     """ prepare auto-correlation data """
     data = get_enriched_dataframe()
     filename = autocorr_image(data["sunspots"])
-    print(filename)
     return filename
 
 
@@ -68,8 +72,13 @@ def plot_lags_correlation_heatmap() -> str:
     """ plot heatmap """
     dataframe = prepare_data()
     correlations = dataframe[get_lag_fields()].corr()
-    os.makedirs("webapp/static", exist_ok=True)
     uuid = random_uuid()
     file_name = os.path.join("webapp", "static", f"heatmap_{uuid}.jpg")
-    sns.heatmap(correlations).get_figure().savefig(file_name)
+    try:
+        os.makedirs("webapp/static", exist_ok=True)
+        sns.heatmap(correlations).get_figure().savefig(file_name)
+    except FileNotFoundError as exc:
+        msg = f"Directory for file {file_name} not exists"
+        logging.error(msg)
+        raise exc
     return file_name
