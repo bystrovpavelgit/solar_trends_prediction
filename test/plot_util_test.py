@@ -5,7 +5,8 @@
 import pandas as pd
 import numpy as np
 import unittest
-from webapp.utils.plot_util import random_uuid, autocorr_image
+from webapp.utils.plot_util import random_uuid, autocorr_image, \
+    plot_lags_correlation_heatmap
 
 
 class PlotUtilTest(unittest.TestCase):
@@ -28,3 +29,15 @@ class PlotUtilTest(unittest.TestCase):
         self.assertTrue(file_name.startswith("webapp/static"))
         self.assertTrue(file_name.endswith(".jpg"))
         self.assertTrue(p_value >= 0.)
+
+    def test_autocorr_image_negatively(self):
+        """ unit-test for autocorr_image """
+        self.assertRaises(ValueError, autocorr_image, None)
+        
+    def test_plot_lags_correlation_heatmap(self):
+        """ unit-test for autocorr_image """
+
+        file_name = plot_lags_correlation_heatmap()
+
+        self.assertTrue(file_name.startswith("webapp/static"))
+        self.assertTrue(file_name.endswith(".jpg"))
