@@ -1,0 +1,19 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+// Define Data
+var data = [
+  {x: {{ time }} , y: {{ y }} , mode: 'lines', name: 'Number of sunspots'},
+  {x: {{ time2 }} , y: {{ y2 }} , mode: 'lines', name: 'FFT method predictions'},
+];
+
+var layout = {title: "Graph of the FFT method predictions for 25 years", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+
+// Display using Plotly
+Plotly.newPlot("myPlot", data, layout);
+</script>
+
+{% endblock %}

@@ -49,4 +49,3 @@ class SunspotNumbers(DB.Model):
     def __repr__(self):
         """repr method"""
         return f"<SunspotNumbers {self.year_float} {self.sunspot_num}>"
-

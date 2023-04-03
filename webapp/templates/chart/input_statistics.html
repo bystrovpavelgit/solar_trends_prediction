@@ -1,0 +1,30 @@
+{% extends "bootstrap.html" %}
+{% block content %}
+
+<div id="myPlot" style="width:100%;max-width:2000px;max-height:800px"></div>
+
+<script>
+var labels = {{ data }};
+var z = [];
+for (var i = 0; i < 4; i++) {
+  var y = ' ' + labels[i] + 'th century';
+  z[i] = y;
+}
+
+var data = [{
+  values: {{ y }},
+  labels: z,
+  name: 'Statistics: Number of data points',
+  hoverinfo: 'label+percent+name',
+  type: 'pie'
+}];
+var layout = {title: "Relative number of points for the Sunspot Numbers data",
+  height: 600,
+  width: 700
+};
+var config = {responsive: true};
+// Display using Plotly
+Plotly.newPlot('myPlot', data, layout, config);
+</script>
+
+{% endblock %}

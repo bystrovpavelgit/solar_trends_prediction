@@ -12,12 +12,12 @@ var y1Values = {{ y }}
 
 // Define Data
 var data = [
-  {x: {{ x }}, y: {{ y }}, mode:"lines", name: "number of sunspots"},
+  {x: {{ x }}, y: {{ y }}, mode:"lines", name: "cycle 26 predictions"},
   {x: {{ x2 }}, y: {{ y2 }}, mode:"lines+markers", name: "cycle 25 predictions"}
 ];
 
 //Define Layout
-var layout = {title: "number of sunspots", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'number of sunspots'}};
+var layout = {title: "Predicted number of sunspots", xaxis: {title: "year", showgrid: true}, yaxis: {title: 'Number of sunspots'}};
 
 // Display using Plotly
 Plotly.newPlot("myPlot", data, layout);
