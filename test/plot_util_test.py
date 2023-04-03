@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import unittest
 from webapp.utils.plot_util import random_uuid, autocorr_image, \
-    plot_lags_correlation_heatmap
+    plot_lags_correlation_heatmap, get_lag_fields
 
 
 class PlotUtilTest(unittest.TestCase):
@@ -41,3 +41,11 @@ class PlotUtilTest(unittest.TestCase):
 
         self.assertTrue(file_name.startswith("webapp/static"))
         self.assertTrue(file_name.endswith(".jpg"))
+
+    def test_get_lag_fields(self):
+        """ unit-test for get_lag_fields """
+        fields = get_lag_fields()
+
+        self.assertIsNotNone(fields)
+        self.assertEqual(len(fields), 34)
+        self.assertEqual(fields[0], "lag_1")
