@@ -4,7 +4,9 @@
 """
 import unittest
 import numpy as np
-from webapp.utils.gaps_util import fill_gaps
+from fedot.core.pipelines.pipeline import Pipeline
+from webapp.utils.gaps_util import fill_gaps, get_simple_pipeline, \
+    get_composite_pipeline
 
 
 class GapsFillTest(unittest.TestCase):
@@ -26,3 +28,17 @@ class GapsFillTest(unittest.TestCase):
         self.assertTrue(np.min(data["composite"].values) > -1.)
         self.assertTrue(np.min(data["ridge"].values) > -1.)
         self.assertTrue(np.min(data["with_gap"].values),  -1.)
+
+    def test_get_simple_pipeline(self):
+        """ юнит-тест для get_simple_pipeline """
+        pipe = get_simple_pipeline()
+
+        self.assertIsNotNone(pipe)
+        self.assertTrue(isinstance(pipe, Pipeline))
+
+    def test_get_composite_pipeline(self):
+        """ юнит-тест для get_composite_pipeline """
+        pipe = get_composite_pipeline()
+
+        self.assertIsNotNone(pipe)
+        self.assertTrue(isinstance(pipe, Pipeline))
