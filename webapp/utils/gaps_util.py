@@ -50,5 +50,5 @@ def fill_gaps(file_path="data/sunspot_gaps.csv"):
         dataframe["composite"] = filler2.forward_filling(gaps)
         return dataframe
     except FileNotFoundError as exc:
-        logging.error(f"ошибка: файл не найден {file_path}")
+        logging.error("ошибка: файл не найден data/sunspot_gaps.csv")
         raise exc

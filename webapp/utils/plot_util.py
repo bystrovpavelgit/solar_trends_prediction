@@ -3,8 +3,8 @@
     plot utility
 """
 import logging
-import numpy as np
 import os
+import numpy as np
 import seaborn as sns
 import statsmodels.api as sm
 import statsmodels.tsa.api as smt

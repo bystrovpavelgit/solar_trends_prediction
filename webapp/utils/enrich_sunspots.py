@@ -19,27 +19,31 @@ def predict_using_cross_validation(clf, params, data, dframe):
     """ predict with classifier using cross-validation with n=3 """
     if clf is None or data is None or dframe is None:
         raise ValueError("Empty parameters")
-    y_max = dframe["y_max"].values
-    y_min = dframe["y_min"].values
-    x_train1, x_test1, max_train, max_test = \
-        train_test_split(data, y_max, test_size=0.1, random_state=9)
-    x_train2, x_test2, min_train, min_test = \
-        train_test_split(data, y_min, test_size=0.1, random_state=9)
+    class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
+    x_train1, x_test1, y_train, max_test = \
+        train_test_split(data,
+                         dframe["y_max"].values,
+                         test_size=0.1,
+                         random_state=9)
     # Initialize a stratified split of dataset for the validation
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=22)
-    gcv1 = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
-    gcv1.fit(x_train1, max_train)
-    pred_max = gcv1.predict(x_test1)
-    mse1 = mean_squared_error(max_test, pred_max)
     gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
-    gcv.fit(x_train2, min_train)
-    pred_min = gcv.predict(x_test2)
-    mse2 = mean_squared_error(min_test, pred_min)
-    class_name = str(clf.__class__)[(str(clf.__class__).rfind(".") + 1):-2]
-    print(f"MSE for maximum using \
-         {class_name} = {mse1} , MSE for minimum = {mse2}")
-    score = (gcv1.best_score_ + gcv.best_score_) * 0.5
-    return score, gcv1.best_params_
+    gcv.fit(x_train1, y_train)
+    mse1 = mean_squared_error(max_test, gcv.predict(x_test1))
+    score = gcv.best_score_
+    x_train1, x_test1, y_train, min_test = \
+        train_test_split(data,
+                         dframe["y_min"].values,
+                         test_size=0.1,
+                         random_state=9)
+    gcv = GridSearchCV(clf, params, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(x_train1, y_train)
+    pred_min = gcv.predict(x_test1)
+    print(f"MSE for maximum using {class_name} = {mse1} , " +
+          f"MSE for minimum = {mean_squared_error(min_test, pred_min)}")
+    score += gcv.best_score_
+    score = score * 0.5
+    return score, gcv.best_params_
 
 
 def evaluate_classifier(clf, params, data_scaled, dframe):
