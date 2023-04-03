@@ -35,3 +35,10 @@ class GapsFillTest(unittest.TestCase):
 
         self.assertIsNotNone(pipe)
         self.assertTrue(isinstance(pipe, Pipeline))
+
+    def test_get_composite_pipeline(self):
+        """ юнит-тест для get_composite_pipeline """
+        pipe = get_composite_pipeline()
+
+        self.assertIsNotNone(pipe)
+        self.assertTrue(isinstance(pipe, Pipeline))
