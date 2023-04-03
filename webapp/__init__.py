@@ -10,6 +10,7 @@ from webapp.stat.views import blueprint as stat_blueprint
 from webapp.user.views import blueprint as user_blueprint
 from webapp.chart.views import blueprint as chart_blueprint
 from webapp.gaps.views import blueprint as gaps_blueprint
+from webapp.modules.error_handler import ErrorHandler
 from webapp.utils.plot_util import prepare_autocorr_data, \
     plot_lags_correlation_heatmap
 
@@ -26,6 +27,8 @@ def create_app():
     app.register_blueprint(user_blueprint)
     app.register_blueprint(chart_blueprint)
     app.register_blueprint(gaps_blueprint)
+    handler = ErrorHandler()
+    handler.init_app(app)
 
     @login_mgr.user_loader
     def load_user(user_id):
@@ -47,9 +50,10 @@ def create_app():
     @app.route("/autocorrelation")
     def auto_correlation():
         """ auto correlation graph """
-        filename, pval = prepare_autocorr_data()
+        filename, p_val = prepare_autocorr_data()
         return render_template("gaps/show_autocorrelation.html",
-                               main_img=filename)
+                               main_img=filename,
+                               p_value=p_val)
 
     @app.route("/heatmap")
     def lags_heatmap():
