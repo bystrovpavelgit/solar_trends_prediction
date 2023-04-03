@@ -33,7 +33,7 @@ class PlotUtilTest(unittest.TestCase):
     def test_autocorr_image_negatively(self):
         """ unit-test for autocorr_image """
         self.assertRaises(ValueError, autocorr_image, None)
-        
+
     def test_plot_lags_correlation_heatmap(self):
         """ unit-test for autocorr_image """
 

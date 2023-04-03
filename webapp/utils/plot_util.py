@@ -5,13 +5,11 @@
 import logging
 import numpy as np
 import os
-import pandas as pd
 import seaborn as sns
 import statsmodels.api as sm
 import statsmodels.tsa.api as smt
 from matplotlib import pyplot as plt
-from webapp.utils.dataframe_util import get_enriched_dataframe, \
-    prepare_data
+from webapp.utils.dataframe_util import get_enriched_dataframe, prepare_data
 
 
 def random_uuid():
@@ -75,6 +73,9 @@ def plot_lags_correlation_heatmap() -> str:
     uuid = random_uuid()
     file_name = os.path.join("webapp", "static", f"heatmap_{uuid}.jpg")
     try:
+        plt.figure(figsize=(11, 7))
+        layout = (1, 1)
+        plt.subplot2grid(layout, (0, 0))
         os.makedirs("webapp/static", exist_ok=True)
         sns.heatmap(correlations).get_figure().savefig(file_name)
     except FileNotFoundError as exc:
